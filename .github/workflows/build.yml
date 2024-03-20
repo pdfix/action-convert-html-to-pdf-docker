@@ -1,0 +1,100 @@
+name: Cross-Platform Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download chrome
+        run: wget -O chrome.zip https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/linux64/chrome-headless-shell-linux64.zip
+      - name: Unpacking chrome
+        run: unzip chrome.zip -d chrome_v122.0.6261.128
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Build binary
+        run: pyinstaller --add-data "chrome_v122.0.6261.128:chrome_v122.0.6261.128" src/html_to_pdf.py
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-binary
+          path: dist/
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download chrome
+        run: powershell -command "(New-Object Net.WebClient).DownloadFile('https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/win64/chrome-headless-shell-win64.zip', 'chrome.zip')"
+      - name: Unpacking chrome
+        run: unzip chrome.zip -d chrome_v122.0.6261.128
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Build binary
+        run: pyinstaller --add-data "chrome_v122.0.6261.128;chrome_v122.0.6261.128" src/html_to_pdf.py
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-binary
+          path: dist/
+
+  build-macos-arm64:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download chrome
+        run: curl -o chrome.zip https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/mac-arm64/chrome-headless-shell-mac-arm64.zip
+      - name: Unpacking chrome
+        run: unzip chrome.zip -d chrome_v122.0.6261.128
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Build ARM64 binary
+        run: pyinstaller --add-data "chrome_v122.0.6261.128:chrome_v122.0.6261.128" --target-architecture=arm64 src/html_to_pdf.py
+      - name: Upload macOS ARM64 Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos-binary-arm64
+          path: dist/
+
+  build-macos-x86_64:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download chrome
+        run: curl -o chrome.zip https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/mac-x64/chrome-headless-shell-mac-x64.zip
+      - name: Unpacking chrome
+        run: unzip chrome.zip -d chrome_v122.0.6261.128
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install pyinstaller
+      - name: Build x86_64 binary
+        run: pyinstaller --add-data "chrome_v122.0.6261.128:chrome_v122.0.6261.128" --target-architecture=x86_64 src/html_to_pdf.py
+      - name: Upload macOS x86_64 Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos-binary-x86_64
+          path: dist/
