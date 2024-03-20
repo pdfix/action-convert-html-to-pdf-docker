@@ -1,4 +1,4 @@
-name: Cross-Platform Build
+name: Deploy
 
 on:
   push:
@@ -10,14 +10,32 @@ on:
   workflow_dispatch:
 
 jobs:
+  prepare:
+      runs-on: ubuntu-latest
+      outputs:
+        short_sha: ${{ steps.short_sha.outputs.short_sha }}
+        chrome_version: ${{ steps.chrome_version.outputs.chrome_version }}
+      steps:
+        - name: Set sha
+          id: short_sha
+          run: echo "short_sha=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_OUTPUT    
+        - name: Set chrome version
+          id: chrome_version
+          run: echo "chrome_version=122.0.6261.111" >> $GITHUB_OUTPUT
+    
   build-linux:
     runs-on: ubuntu-latest
+    needs: prepare
     steps:
+      # - env:
+      #     SHORT_SHA: ${{needs.prepare.outputs.short_sha}}
+      #     CHROME_VERSION: ${{needs.prepare.outputs.chrome_version}}
+      #   run: echo "$SHORT_SHA $CHROME_VERSION"
       - uses: actions/checkout@v2
       - name: Download chrome
-        run: wget -O chrome.zip https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/linux64/chrome-headless-shell-linux64.zip
+        run: wget -O chrome.zip https://storage.googleapis.com/chrome-for-testing-public/${{ needs.prepare.outputs.chrome_version }}/linux64/chrome-headless-shell-linux64.zip
       - name: Unpacking chrome
-        run: unzip chrome.zip -d chrome_v122.0.6261.128
+        run: unzip chrome.zip -d chrome_v${{ needs.prepare.outputs.chrome_version }}
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -26,21 +44,22 @@ jobs:
         run: |
           pip install -r requirements.txt
       - name: Build binary
-        run: pyinstaller --add-data "chrome_v122.0.6261.128:chrome_v122.0.6261.128" src/html_to_pdf.py
-      - name: Upload Linux Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: linux-binary
-          path: dist/
+        run: pyinstaller --add-data "chrome_v${{ needs.prepare.outputs.chrome_version }}:chrome_v${{ needs.prepare.outputs.chrome_version }}" src/html_to_pdf.py
+      - name: Zip the dist folder
+        run: zip -r html-to-pdf-${{ needs.prepare.outputs.short_sha }}-linux-x86_64.zip dist/
+      - name: Upload ZIP to FTP
+        run: |
+          curl -T html-to-pdf-${{ needs.prepare.outputs.short_sha }}-linux-x86_64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ftp_dev:s7^?5L{w%QbP8yc --ftp-create-dirs  
 
   build-windows:
     runs-on: windows-latest
+    needs: prepare
     steps:
       - uses: actions/checkout@v2
       - name: Download chrome
-        run: powershell -command "(New-Object Net.WebClient).DownloadFile('https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/win64/chrome-headless-shell-win64.zip', 'chrome.zip')"
+        run: powershell -command "(New-Object Net.WebClient).DownloadFile('https://storage.googleapis.com/chrome-for-testing-public/${{ needs.prepare.outputs.chrome_version }}/win64/chrome-headless-shell-win64.zip', 'chrome.zip')"
       - name: Unpacking chrome
-        run: unzip chrome.zip -d chrome_v122.0.6261.128
+        run: unzip chrome.zip -d chrome_v${{ needs.prepare.outputs.chrome_version }}
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -48,21 +67,23 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Build binary
-        run: pyinstaller --add-data "chrome_v122.0.6261.128;chrome_v122.0.6261.128" src/html_to_pdf.py
-      - name: Upload Windows Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: windows-binary
-          path: dist/
+        run: pyinstaller --add-data "chrome_v${{ needs.prepare.outputs.chrome_version }};chrome_v${{ needs.prepare.outputs.chrome_version }}" src/html_to_pdf.py
+      - name: Zip the dist folder
+        run: zip -r html-to-pdf-${{ needs.prepare.outputs.short_sha }}-windows-x86_64.zip dist/
+      - name: Upload ZIP to FTP
+        run: |
+          curl -T html-to-pdf-${{ needs.prepare.outputs.short_sha }}-windows-x86_64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ftp_dev:s7^?5L{w%QbP8yc --ftp-create-dirs 
+
 
   build-macos-arm64:
     runs-on: macos-14
+    needs: prepare
     steps:
       - uses: actions/checkout@v2
       - name: Download chrome
-        run: curl -o chrome.zip https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/mac-arm64/chrome-headless-shell-mac-arm64.zip
+        run: curl -o chrome.zip https://storage.googleapis.com/chrome-for-testing-public/${{ needs.prepare.outputs.chrome_version }}/mac-arm64/chrome-headless-shell-mac-arm64.zip
       - name: Unpacking chrome
-        run: unzip chrome.zip -d chrome_v122.0.6261.128
+        run: unzip chrome.zip -d chrome_v${{ needs.prepare.outputs.chrome_version }}
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -70,21 +91,22 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Build ARM64 binary
-        run: pyinstaller --add-data "chrome_v122.0.6261.128:chrome_v122.0.6261.128" --target-architecture=arm64 src/html_to_pdf.py
-      - name: Upload macOS ARM64 Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: macos-binary-arm64
-          path: dist/
+        run: pyinstaller --add-data "chrome_v${{ needs.prepare.outputs.chrome_version }}:chrome_v${{ needs.prepare.outputs.chrome_version }}" --target-architecture=arm64 src/html_to_pdf.py
+      - name: Zip the dist folder
+        run: zip -r html-to-pdf-${{ needs.prepare.outputs.short_sha }}-mac-arm64.zip dist/
+      - name: Upload ZIP to FTP
+        run: |
+          curl -T html-to-pdf-${{ needs.prepare.outputs.short_sha }}-mac-arm64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ftp_dev:s7^?5L{w%QbP8yc --ftp-create-dirs 
 
   build-macos-x86_64:
     runs-on: macos-latest
+    needs: prepare
     steps:
       - uses: actions/checkout@v2
       - name: Download chrome
-        run: curl -o chrome.zip https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/mac-x64/chrome-headless-shell-mac-x64.zip
+        run: curl -o chrome.zip https://storage.googleapis.com/chrome-for-testing-public/${{ needs.prepare.outputs.chrome_version }}/mac-x64/chrome-headless-shell-mac-x64.zip
       - name: Unpacking chrome
-        run: unzip chrome.zip -d chrome_v122.0.6261.128
+        run: unzip chrome.zip -d chrome_v${{ needs.prepare.outputs.chrome_version }}
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -92,9 +114,9 @@ jobs:
       - name: Install dependencies
         run: pip install pyinstaller
       - name: Build x86_64 binary
-        run: pyinstaller --add-data "chrome_v122.0.6261.128:chrome_v122.0.6261.128" --target-architecture=x86_64 src/html_to_pdf.py
-      - name: Upload macOS x86_64 Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: macos-binary-x86_64
-          path: dist/
+        run: pyinstaller --add-data "chrome_v${{ needs.prepare.outputs.chrome_version }}:chrome_v${{ needs.prepare.outputs.chrome_version }}" --target-architecture=x86_64 src/html_to_pdf.py
+      - name: Zip the dist folder
+        run: zip -r html-to-pdf-${{ needs.prepare.outputs.short_sha }}-mac-x86_64.zip dist/
+      - name: Upload ZIP to FTP
+        run: |
+          curl -T html-to-pdf-${{ needs.prepare.outputs.short_sha }}-mac-x86_64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ftp_dev:s7^?5L{w%QbP8yc --ftp-create-dirs 
