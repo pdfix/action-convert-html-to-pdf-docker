@@ -21,7 +21,7 @@ jobs:
           run: echo "short_sha=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_OUTPUT    
         - name: Set chrome version
           id: chrome_version
-          run: echo "chrome_version=122.0.6261.111" >> $GITHUB_OUTPUT
+          run: echo "chrome_version=122.0.6261.128" >> $GITHUB_OUTPUT
     
   build-linux:
     runs-on: ubuntu-latest
