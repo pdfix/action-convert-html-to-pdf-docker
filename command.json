@@ -1,0 +1,18 @@
+{
+  "commands": [
+    {
+      "Title": "HTML to PDF/UA",
+      "name": "html_to_pdf_ua",
+      "catgory": "Conversion",
+      "cli": "pdf_to_html",
+      "flags": 1,
+      "params": [
+        {
+          "title": "",
+          "name" : "url",
+          "type": "string"
+        }
+      ]
+    }
+  ]
+}
