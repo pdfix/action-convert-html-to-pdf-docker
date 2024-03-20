@@ -72,7 +72,7 @@ jobs:
         run: Compress-Archive -Path dist/* -DestinationPath html-to-pdf-${{ needs.prepare.outputs.short_sha }}-windows-x86_64.zip 
       - name: Upload ZIP to FTP
         run: |
-          curl -T html-to-pdf-${{ needs.prepare.outputs.short_sha }}-windows-x86_64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }} --ftp-create-dirs 
+          curl -T html-to-pdf-${{ needs.prepare.outputs.short_sha }}-windows-x86_64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" --ftp-create-dirs 
 
 
   build-macos-arm64:
