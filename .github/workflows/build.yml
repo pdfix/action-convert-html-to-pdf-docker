@@ -1,4 +1,4 @@
-name: Deploy
+name: Cross-Platform Build
 
 on:
   push:
@@ -69,10 +69,10 @@ jobs:
       - name: Build binary
         run: pyinstaller --add-data "chrome_v${{ needs.prepare.outputs.chrome_version }};chrome_v${{ needs.prepare.outputs.chrome_version }}" src/html_to_pdf.py
       - name: Zip the dist folder
-        run: zip -r html-to-pdf-${{ needs.prepare.outputs.short_sha }}-windows-x86_64.zip dist/
+        run: Compress-Archive -Path dist/* -DestinationPath html-to-pdf-${{ needs.prepare.outputs.short_sha }}-windows-x86_64.zip 
       - name: Upload ZIP to FTP
         run: |
-          curl -T html-to-pdf-${{ needs.prepare.outputs.short_sha }}-windows-x86_64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ftp_dev:s7^?5L{w%QbP8yc --ftp-create-dirs 
+          curl -T html-to-pdf-${{ needs.prepare.outputs.short_sha }}-windows-x86_64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user "ftp_dev:s7^?5L{w%QbP8yc" --ftp-create-dirs 
 
 
   build-macos-arm64:
@@ -95,6 +95,7 @@ jobs:
       - name: Zip the dist folder
         run: zip -r html-to-pdf-${{ needs.prepare.outputs.short_sha }}-mac-arm64.zip dist/
       - name: Upload ZIP to FTP
+        shell: bash
         run: |
           curl -T html-to-pdf-${{ needs.prepare.outputs.short_sha }}-mac-arm64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ftp_dev:s7^?5L{w%QbP8yc --ftp-create-dirs 
 
