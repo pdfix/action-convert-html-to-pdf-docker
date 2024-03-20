@@ -9,7 +9,7 @@ import sys
 import requests
 from tqdm import tqdm
 
-CHROME_VERSION = "122.0.6261.111"
+CHROME_VERSION = "122.0.6261.128"
 
 
 def setup_chrome_cli() -> str:
