@@ -1,0 +1,19 @@
+{
+  "plug-in":     {
+    "type": "custom",
+    "name": "html_to_pdf",
+    "cmd": "html_to_pdf",
+    "path": "${PUGIN_FOLDER}",
+    "args": [
+      {
+        "name": "--url",
+        "value": "${URL}"
+      },
+      {
+        "name": "--output",
+        "type": "file_path",
+        "value": "${OUTPUT_FILE}"
+      }
+    ]
+  }
+}
