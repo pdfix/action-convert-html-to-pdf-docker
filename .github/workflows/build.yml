@@ -21,7 +21,7 @@ jobs:
           run: echo "short_sha=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_OUTPUT    
         - name: Set chrome version
           id: chrome_version
-          run: echo "chrome_version=122.0.6261.111" >> $GITHUB_OUTPUT
+          run: echo "chrome_version=122.0.6261.128" >> $GITHUB_OUTPUT
     
   build-linux:
     runs-on: ubuntu-latest
@@ -46,10 +46,10 @@ jobs:
       - name: Build binary
         run: pyinstaller --add-data "chrome_v${{ needs.prepare.outputs.chrome_version }}:chrome_v${{ needs.prepare.outputs.chrome_version }}" src/html_to_pdf.py
       - name: Zip the dist folder
-        run: zip -r html-to-pdf_${{ needs.prepare.outputs.short_sha }}_linux-x86_64.zip dist/
+        run: cd dist/ && zip -r ../html-to-pdf_${{ needs.prepare.outputs.short_sha }}_linux-x86_64.zip html_to_pdf/ && cd ../
       - name: Upload ZIP to FTP
         run: |
-          curl -T html-to-pdf_${{ needs.prepare.outputs.short_sha }}_linux-x86_64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }} --ftp-create-dirs  
+          curl -T html-to-pdf_${{ needs.prepare.outputs.short_sha }}_linux-x86_64.zip ftp://dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }} --ftp-create-dirs  
 
   build-windows:
     runs-on: windows-latest
@@ -72,7 +72,7 @@ jobs:
         run: Compress-Archive -Path dist/* -DestinationPath html-to-pdf_${{ needs.prepare.outputs.short_sha }}_windows-x86_64.zip 
       - name: Upload ZIP to FTP
         run: |
-          curl -T html-to-pdf_${{ needs.prepare.outputs.short_sha }}_windows-x86_64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" --ftp-create-dirs 
+          curl -T html-to-pdf_${{ needs.prepare.outputs.short_sha }}_windows-x86_64.zip ftp://dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" --ftp-create-dirs 
 
 
   build-macos-arm64:
@@ -93,11 +93,11 @@ jobs:
       - name: Build ARM64 binary
         run: pyinstaller --add-data "chrome_v${{ needs.prepare.outputs.chrome_version }}:chrome_v${{ needs.prepare.outputs.chrome_version }}" --target-architecture=arm64 src/html_to_pdf.py
       - name: Zip the dist folder
-        run: zip -r html-to-pdf_${{ needs.prepare.outputs.short_sha }}_macos-arm64.zip dist/
+        run: cd dist/ && zip -r ../html-to-pdf_${{ needs.prepare.outputs.short_sha }}_macos-arm64.zip html_to_pdf/ && cd ../      
       - name: Upload ZIP to FTP
         shell: bash
         run: |
-          curl -T html-to-pdf_${{ needs.prepare.outputs.short_sha }}_macos-arm64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }} --ftp-create-dirs 
+          curl -T html-to-pdf_${{ needs.prepare.outputs.short_sha }}_macos-arm64.zip ftp://dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }} --ftp-create-dirs 
 
   build-macos-x86_64:
     runs-on: macos-latest
@@ -117,7 +117,7 @@ jobs:
       - name: Build x86_64 binary
         run: pyinstaller --add-data "chrome_v${{ needs.prepare.outputs.chrome_version }}:chrome_v${{ needs.prepare.outputs.chrome_version }}" --target-architecture=x86_64 src/html_to_pdf.py
       - name: Zip the dist folder
-        run: zip -r html-to-pdf_${{ needs.prepare.outputs.short_sha }}_macos-x86_64.zip dist/
+        run: cd dist/ && zip -r ../html-to-pdf_${{ needs.prepare.outputs.short_sha }}_macos-x86_64.zip html_to_pdf/ && cd ../
       - name: Upload ZIP to FTP
         run: |
-          curl -T html-to-pdf_${{ needs.prepare.outputs.short_sha }}_macos-x86_64.zip ftp://ftp_dev@dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }} --ftp-create-dirs 
+          curl -T html-to-pdf_${{ needs.prepare.outputs.short_sha }}_macos-x86_64.zip ftp://dev.linux.build.pdfix.net/public/builds/plug-ins/html-to-pdf/main/${{ needs.prepare.outputs.short_sha }}/ --user ${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }} --ftp-create-dirs 
