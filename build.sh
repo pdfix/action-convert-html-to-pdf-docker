@@ -90,13 +90,13 @@ fi
 
 install_dependencies
 
-version=122.0.6261.111
+version=122.0.6261.128
 
 if check_directory_exists "chrome_v${version}";then
 
-	linux_url="https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/linux64/chrome-headless-shell-linux64.zip"
-	mac_url="https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/mac-arm64/chrome-headless-shell-mac-arm64.zip"
-	windows_url="https://storage.googleapis.com/chrome-for-testing-public/122.0.6261.128/win64/chrome-headless-shell-win64.zip"
+	linux_url="https://storage.googleapis.com/chrome-for-testing-public/$version/linux64/chrome-headless-shell-linux64.zip"
+	mac_url="https://storage.googleapis.com/chrome-for-testing-public/$version/mac-arm64/chrome-headless-shell-mac-arm64.zip"
+	windows_url="https://storage.googleapis.com/chrome-for-testing-public/$version/win64/chrome-headless-shell-win64.zip"
 
 	echo 'Downloading chrome version '${version}'...'
 	if [[ $(uname -s) == "Linux" ]]; then
