@@ -6,7 +6,7 @@ a = Analysis(
     pathex=[],
     binaries=[],
     datas=[
-        ( 'chrome_v122.0.6261.111', 'chrome_v122.0.6261.111' ),
+        ( 'chrome', 'chrome' ),
         ],
     hiddenimports=[],
     hookspath=[],

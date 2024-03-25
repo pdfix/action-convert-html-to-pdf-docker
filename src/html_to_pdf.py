@@ -9,8 +9,6 @@ import sys
 import requests
 from tqdm import tqdm
 
-CHROME_VERSION = "122.0.6261.128"
-
 
 def setup_chrome_cli() -> str:
     pltfm = platform.system()
@@ -20,30 +18,13 @@ def setup_chrome_cli() -> str:
     # print(arch)
     if pltfm == "Darwin":
         if arch == "arm":
-            return (
-                "chrome_v"
-                + CHROME_VERSION
-                + "/chrome-headless-shell-mac-arm64/chrome-headless-shell"
-            )
+            return "chrome/chrome-headless-shell-mac-arm64/chrome-headless-shell"
         else:
-            return (
-                "chrome_v"
-                + CHROME_VERSION
-                + "/chrome-headless-shell-mac-x64/chrome-headless-shell"
-            )
-
+            return "chrome/chrome-headless-shell-mac-x64/chrome-headless-shell"
     elif pltfm == "Linux":
-        return (
-            "chrome_v"
-            + CHROME_VERSION
-            + "/chrome-headless-shell-linux64/chrome-headless-shell"
-        )
+        return "chrome/chrome-headless-shell-linux64/chrome-headless-shell"
     elif pltfm == "Windows":
-        return (
-            "chrome_v"
-            + CHROME_VERSION
-            + "/chrome-headless-shell-win64/chrome-headless-shell.exe"
-        )
+        return "chrome/chrome-headless-shell-win64/chrome-headless-shell.exe"
     else:
         raise Exception("Unknown platform")
 

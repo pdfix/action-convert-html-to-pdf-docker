@@ -27,15 +27,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: prepare
     steps:
-      # - env:
-      #     SHORT_SHA: ${{needs.prepare.outputs.short_sha}}
-      #     CHROME_VERSION: ${{needs.prepare.outputs.chrome_version}}
-      #   run: echo "$SHORT_SHA $CHROME_VERSION"
       - uses: actions/checkout@v2
       - name: Download chrome
         run: wget -O chrome.zip https://storage.googleapis.com/chrome-for-testing-public/${{ needs.prepare.outputs.chrome_version }}/linux64/chrome-headless-shell-linux64.zip
       - name: Unpacking chrome
-        run: unzip chrome.zip -d chrome_v${{ needs.prepare.outputs.chrome_version }}
+        run: unzip chrome.zip -d chrome
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -44,7 +40,7 @@ jobs:
         run: |
           pip install -r requirements.txt
       - name: Build binary
-        run: pyinstaller --add-data "chrome_v${{ needs.prepare.outputs.chrome_version }}:chrome_v${{ needs.prepare.outputs.chrome_version }}" src/html_to_pdf.py
+        run: pyinstaller html_to_pdf.spec
       - name: Zip the dist folder
         run: cd dist/ && zip -r ../html-to-pdf_${{ needs.prepare.outputs.short_sha }}_linux-x86_64.zip html_to_pdf/ && cd ../
       - name: Upload ZIP to FTP
@@ -67,7 +63,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Build binary
-        run: pyinstaller --add-data "chrome_v${{ needs.prepare.outputs.chrome_version }};chrome_v${{ needs.prepare.outputs.chrome_version }}" src/html_to_pdf.py
+        run: pyinstaller html_to_pdf.spec
       - name: Zip the dist folder
         run: Compress-Archive -Path dist/* -DestinationPath html-to-pdf_${{ needs.prepare.outputs.short_sha }}_windows-x86_64.zip 
       - name: Upload ZIP to FTP
@@ -91,7 +87,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
       - name: Build ARM64 binary
-        run: pyinstaller --add-data "chrome_v${{ needs.prepare.outputs.chrome_version }}:chrome_v${{ needs.prepare.outputs.chrome_version }}" --target-architecture=arm64 src/html_to_pdf.py
+        run: pyinstaller html_to_pdf.spec
       - name: Zip the dist folder
         run: cd dist/ && zip -r ../html-to-pdf_${{ needs.prepare.outputs.short_sha }}_macos-arm64.zip html_to_pdf/ && cd ../      
       - name: Upload ZIP to FTP
@@ -115,7 +111,7 @@ jobs:
       - name: Install dependencies
         run: pip install pyinstaller
       - name: Build x86_64 binary
-        run: pyinstaller --add-data "chrome_v${{ needs.prepare.outputs.chrome_version }}:chrome_v${{ needs.prepare.outputs.chrome_version }}" --target-architecture=x86_64 src/html_to_pdf.py
+        run: pyinstaller html_to_pdf.spec
       - name: Zip the dist folder
         run: cd dist/ && zip -r ../html-to-pdf_${{ needs.prepare.outputs.short_sha }}_macos-x86_64.zip html_to_pdf/ && cd ../
       - name: Upload ZIP to FTP
