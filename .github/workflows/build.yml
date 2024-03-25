@@ -41,6 +41,8 @@ jobs:
           pip install -r requirements.txt
       - name: Build binary
         run: pyinstaller html_to_pdf.spec
+      - name: Copy config files
+        run: cp config.json dist/html_to_pdf/
       - name: Zip the dist folder
         run: cd dist/ && zip -r ../html-to-pdf_${{ needs.prepare.outputs.short_sha }}_linux-x86_64.zip html_to_pdf/ && cd ../
       - name: Upload ZIP to FTP
@@ -64,6 +66,8 @@ jobs:
         run: pip install -r requirements.txt
       - name: Build binary
         run: pyinstaller html_to_pdf.spec
+      - name: Copy config files
+        run: cp config.json dist/html_to_pdf/
       - name: Zip the dist folder
         run: Compress-Archive -Path dist/* -DestinationPath html-to-pdf_${{ needs.prepare.outputs.short_sha }}_windows-x86_64.zip 
       - name: Upload ZIP to FTP
@@ -88,6 +92,8 @@ jobs:
         run: pip install -r requirements.txt
       - name: Build ARM64 binary
         run: pyinstaller html_to_pdf.spec
+      - name: Copy config files
+        run: cp config.json dist/html_to_pdf/
       - name: Zip the dist folder
         run: cd dist/ && zip -r ../html-to-pdf_${{ needs.prepare.outputs.short_sha }}_macos-arm64.zip html_to_pdf/ && cd ../      
       - name: Upload ZIP to FTP
@@ -112,6 +118,8 @@ jobs:
         run: pip install pyinstaller
       - name: Build x86_64 binary
         run: pyinstaller html_to_pdf.spec
+      - name: Copy config files
+        run: cp config.json dist/html_to_pdf/
       - name: Zip the dist folder
         run: cd dist/ && zip -r ../html-to-pdf_${{ needs.prepare.outputs.short_sha }}_macos-x86_64.zip html_to_pdf/ && cd ../
       - name: Upload ZIP to FTP
