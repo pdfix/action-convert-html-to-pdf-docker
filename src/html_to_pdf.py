@@ -1,21 +1,22 @@
 import argparse
 import os
 import platform
-import random
-import string
 import subprocess
 import sys
 
 import requests
-from tqdm import tqdm
+
+DEBUG = False
 
 
 def setup_chrome_cli() -> str:
     pltfm = platform.system()
     arch = platform.processor()
 
-    # print(pltfm)
-    # print(arch)
+    if DEBUG:
+        print("Platform: {}".format(pltfm))
+        print("Architecture: {}".format(arch))
+
     if pltfm == "Darwin":
         if arch == "arm":
             return "chrome/chrome-headless-shell-mac-arm64/chrome-headless-shell"
@@ -36,7 +37,17 @@ def download_website(url):
 
 
 def convert_to_pdf(url: str, output: str):
-    web_content = download_website(url)
+    if url.startswith("https://"):
+        if DEBUG:
+            print("Downloading html from url: {}".format(url))
+
+        web_content = download_website(url)
+    else:
+        if DEBUG:
+            print("Using local html from path: {}".format(url))
+
+        with open(url, "rb") as file:
+            web_content = file.read()
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -46,6 +57,9 @@ def convert_to_pdf(url: str, output: str):
         print("Chrome cli was not found.", file=sys.stderr)
 
     chrome_cli = os.path.normpath(dir_path + "/" + chrome_cli)
+
+    if DEBUG:
+        print("Path to chrome CLI: {}".format(chrome_cli))
 
     out_dir = os.path.normpath(dir_path + "/" + os.path.dirname(output))
     if not os.path.exists(out_dir):
@@ -70,10 +84,14 @@ def convert_to_pdf(url: str, output: str):
         file_path,
     ]
 
+    if DEBUG:
+        print("Running chrome cli with args: {}".format(" ".join(args)))
+
     result = subprocess.run(args, shell=False, capture_output=True, text=True)
 
     if result.returncode == 0:
-        print("Command executed successfully")
+        if DEBUG:
+            print("Command executed successfully")
     else:
         print("Error:", result.stderr, file=sys.stderr)
 
@@ -86,9 +104,19 @@ def convert_to_pdf(url: str, output: str):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--url", help="URL", required=True)
+    parser.add_argument(
+        "--url", help="URL address or local path to HTML", required=True
+    )
     parser.add_argument("--output", help="Output file", required=True)
+    parser.add_argument(
+        "--verbose", help="Print debug info", required=False, action="store_true"
+    )
     args = parser.parse_args()
+
+    if args.verbose:
+        print("Running in verbose mode. Debug messages enabled.")
+        global DEBUG
+        DEBUG = True
 
     convert_to_pdf(args.url, args.output)
 
