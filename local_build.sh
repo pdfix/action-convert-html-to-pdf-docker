@@ -97,3 +97,5 @@ rm chrome.zip
 
 echo 'Building executable...'
 pyinstaller "html_to_pdf.spec"
+
+cp config.json dist/html_to_pdf/
