@@ -1,5 +1,10 @@
 {
-  "plug-in":     {
+  "version": {
+    "major": 0,
+    "minor": 2,
+    "patch": 0
+  },
+  "plug-in": {
     "type": "custom",
     "name": "html_to_pdf",
     "cmd": "html_to_pdf",
