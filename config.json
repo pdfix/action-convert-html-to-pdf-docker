@@ -15,6 +15,7 @@
       {
         "title": "URL",
         "desc": "URL address.",
+        "type": "string",
         "name": "--url",
         "value": "${URL}"
       },
