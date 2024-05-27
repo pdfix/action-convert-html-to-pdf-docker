@@ -36,10 +36,10 @@ activate_venv_win() {
     fi
 }
 
-
-if [[ "$(uname -s)" = "Linux" ]] || [[ "$(uname -s)" = "Darwin" ]]; then
+cd "$(dirname "$0")"
+if [ "$(uname -s)" = "Linux" ] || [ "$(uname -s)" = "Darwin" ]; then
     activate_venv_unix
-elif [[ "$(uname -o)" = "Msys" ]]; then
+elif [ "$(uname -o)" = "Msys" ]; then
     activate_venv_win
 else
     echo "Unsupported OS type: $(uname -s)"
