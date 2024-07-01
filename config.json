@@ -8,23 +8,21 @@
   "pipeline": [
     {
       "name": "HTML to PDF",
-      "desc": "Creating PDF file from HTML.",
+      "desc": "Creating PDF document from HTML.",
       "path": "user-defined command folder",
       "program": "html_to_pdf",
       "stdout": "",
       "stderr": "",
-      "returnCodes": [
-        0
-      ],
+      "returnCodes" : [0],
       "configuration": [
         {
           "name": "Convert HTML to PDF.",
-          "desc": "Run VeraPDF to validate PDF document.",
+          "desc": "Create PDF document from HTML.",
           "args": [
             "---url",
             "${URL}",
             "--output",
-            "${Output}"
+            "${Output PDF}"
           ]
         }
       ],
@@ -36,7 +34,7 @@
           "value": "user-defined url address"
         },
         {
-          "name": "Output",
+          "name": "Output PDF",
           "desc": "Output PDF file.",
           "type": "file_path_save",
           "value": "user-defined file path"
