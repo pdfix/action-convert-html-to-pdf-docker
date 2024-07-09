@@ -13,19 +13,19 @@
       "program": "html_to_pdf",
       "stdout": "",
       "stderr": "",
-      "returnCodes" : [0],
-      "configuration": [
-        {
-          "name": "Convert HTML to PDF.",
-          "desc": "Create PDF document from HTML.",
-          "args": [
-            "---url",
-            "${URL}",
-            "--output",
-            "${Output PDF}"
-          ]
-        }
+      "returnCodes": [
+        0
       ],
+      "configuration": {
+        "name": "Convert HTML to PDF.",
+        "desc": "Create PDF document from HTML.",
+        "args": [
+          "---url",
+          "${URL}",
+          "--output",
+          "${Output PDF}"
+        ]
+      },
       "args": [
         {
           "name": "URL",
