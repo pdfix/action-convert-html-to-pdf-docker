@@ -11,6 +11,7 @@
       "desc": "Creating PDF document from HTML.",
       "path": "user-defined command folder",
       "program": "html_to_pdf",
+      "category": "Conversion",
       "stdout": "",
       "stderr": "",
       "returnCodes": [
