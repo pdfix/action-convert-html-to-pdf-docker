@@ -31,12 +31,15 @@
         {
           "name": "URL",
           "desc": "URL address.",
+          "flags": 2,
           "type": "string",
           "value": "user-defined url address"
         },
         {
           "name": "Output PDF",
           "desc": "Output PDF file.",
+          "flags": 4,
+          "ext": "pdf",
           "type": "file_path_save",
           "value": "user-defined file path"
         }
