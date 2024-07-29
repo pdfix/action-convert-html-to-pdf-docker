@@ -48,6 +48,7 @@ fi
 
 usage() {
     echo "Usage: $0 --url <URL> --output <output_file.pdf>"
+    echo "Usage: $0 --input <index.html> --output <output_file.pdf>"
     exit 1
 }
 
@@ -58,6 +59,9 @@ OUTPUT=""
 while [ "$1" != "" ]; do
     case $1 in
         --url )           shift
+                          URL=$1
+                          ;;
+        --input )         shift
                           URL=$1
                           ;;
         --output )        shift
