@@ -82,7 +82,8 @@ SCRIPT_PATH=$(realpath "$0")
 # Get the directory where this script is located
 SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
 
-python3 ${SCRIPT_DIR}/src/html_to_pdf.py --url "$URL" --output "$OUTPUT"
+${SCRIPT_DIR}/dist/html_to_pdf/html_to_pdf --url "$URL" --output "$OUTPUT"
+#python3 ${SCRIPT_DIR}/src/html_to_pdf.py --url "$URL" --output "$OUTPUT"
 
 # Check if the command was successful
 if [ $? -eq 0 ]; then
