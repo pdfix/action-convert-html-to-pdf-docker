@@ -17,6 +17,28 @@
       "returnCodes": [
         0
       ],
+      "configurations": [
+        {
+          "name": "Convert url HTML to PDF.",
+          "desc": "Create PDF document from HTML url address.",
+          "args": [
+            "---url",
+            "${URL}",
+            "--output",
+            "${Output PDF}"
+          ]
+        },
+        {
+          "args": [
+            "--input",
+            "${Input File}",
+            "--output",
+            "${Output PDF}"
+          ],
+          "name": "Convert index file HTML to PDF.",
+          "desc": "Create PDF document from HTML index file."
+        }
+      ],
       "configuration": {
         "name": "Convert HTML to PDF.",
         "desc": "Create PDF document from HTML.",
@@ -34,6 +56,14 @@
           "flags": 2,
           "type": "string",
           "value": "user-defined url address"
+        },
+        {
+          "name": "Input File",
+          "desc": "HTML index file.",
+          "ext": "html",
+          "type": "file_path",
+          "flags": 2,
+          "value": "user-defined file path"
         },
         {
           "name": "Output PDF",
