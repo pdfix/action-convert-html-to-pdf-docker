@@ -1,11 +1,11 @@
 {
-  "name": "Pipeline HTML to PDF",
-  "desc": "Pipeline running HTML to PDF command.",
+  "name": "HTML to PDF",
+  "desc": "Action convert HTML to PDF.",
   "version": {
     "major": 1,
     "minor": 0
   },
-  "pipeline": [
+  "actions": [
     {
       "name": "HTML to PDF",
       "desc": "Creating PDF document from HTML.",
