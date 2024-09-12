@@ -14,7 +14,7 @@ docker build --platform linux/amd64 --rm -t html-to-pdfua .
 
 Run image
 ```
-docker run --name pdfix --platform linux/amd64 --rm -v $(pwd)/out:/pdfix/out -it html-to-pdfua python3 src/run.py --url {url}
+docker run --rm -v $(pwd):/data -w /data -it html-to-pdf --url {url} -o index.html
 ```
 
 Parameter --url can be real url address or path to a local HTML file mapped from the host.

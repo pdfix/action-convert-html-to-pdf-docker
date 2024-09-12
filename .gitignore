@@ -9,6 +9,7 @@ venv/
 node_modules/
 dist/
 chrome-headless-shell*
+.test
 
 # Compiled Java class files
 *.class

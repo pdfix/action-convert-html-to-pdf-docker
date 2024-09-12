@@ -26,6 +26,8 @@ RUN chmod +x download_chrome.sh
 RUN /usr/html-to-pdf/download_chrome.sh
 
 # Copy the source code
+COPY config.json /usr/html-to-pdf/
+COPY run.sh /usr/html-to-pdf/
 COPY src/ /usr/html-to-pdf/src/
 
 # Copy requirements.txt
@@ -35,4 +37,4 @@ COPY requirements.txt /usr/html-to-pdf/
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-ENTRYPOINT ["venv/bin/python3", "src/main.py"]
+ENTRYPOINT ["/usr/html-to-pdf/venv/bin/python3", "/usr/html-to-pdf/src/main.py"]

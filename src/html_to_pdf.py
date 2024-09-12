@@ -3,6 +3,7 @@ import subprocess
 import os
 import requests
 import sys
+import tempfile, uuid
 
 
 def setup_chrome_cli() -> str:
@@ -44,19 +45,20 @@ def convert_to_pdf(url: str, output: str):
 
     chrome_cli = os.path.normpath(dir_path + "/" + chrome_cli)
 
-    out_dir = os.path.normpath(dir_path + "/" + os.path.dirname(output))
-    if not os.path.exists(out_dir):
-        os.makedirs(out_dir)
+    # out_dir = os.path.normpath(dir_path + "/" + os.path.dirname(output))
+    out_dir = tempfile.gettempdir()
+    # if not os.path.exists(out_dir):
+    #     os.makedirs(out_dir)
 
-    file_path = os.path.join(out_dir, "temp.html")
-
+    # file_path = os.path.join(out_dir, "temp.html")
+    file_path = tempfile.gettempdir() + str(uuid.uuid4()) + ".html"
     with open(file_path, "wb") as f:
         f.write(web_content)
 
-    if os.path.isabs(output):
-        name = output
-    else:
-        name = os.path.join(out_dir, os.path.basename(output))
+    # if os.path.isabs(output):
+    name = output
+    # else:
+    #     name = os.path.join(out_dir, os.path.basename(output))
 
     args = [
         chrome_cli,
