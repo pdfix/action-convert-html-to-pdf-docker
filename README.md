@@ -2,22 +2,60 @@
 
 HTML to PDF/UA conversion with Google Chrome Headless and PDFix SDK
 
-## OS/ARCH
+## Table of Contents
 
-linux/amd64
+- [HTML to PDF/UA conversion](#html-to-pdfua-conversion)
+  - [Table of Contents](#table-of-contents)
+  - [Getting Started](#getting-started)
+  - [Run using Command Line Interface](#run-using-command-line-interface)
+  - [Run OCR using REST API](#run-ocr-using-rest-api)
+    - [Exporting Configuration for Integration](#exporting-configuration-for-integration)
+  - [License \& libraries used](#license--libraries-used)
+  - [Help \& Support](#help--support)
 
-## Usage
-Build image
+## Getting Started
+
+To use this Docker application, you'll need to have Docker installed on your system. If Docker is not installed, please follow the instructions on the [official Docker website](https://docs.docker.com/get-docker/) to install it.
+
+
+
+## Run using Command Line Interface
+
+To run docker container as CLI you should share the folder with html file to process using `--url` parameter. In this example it's current folder. The url can be local html file or URL address.
+
+```bash
+docker run -v $(pwd):/data/ -w /data/ pdfix/html-to-pdf:latest html-to-pdf --url index.html -o convert.pdf
 ```
-docker build --platform linux/amd64 --rm -t html-to-pdfua . 
+
+With PDFix License add these arguments. 
+```bash
+--name ${LICENSE_NAME} --key ${LICENSE_KEY}
 ```
 
-Run image
-```
-docker run --rm -v $(pwd):/data -w /data -it html-to-pdf --url {url} -o index.html
+First run will pull the docker image, which may take some time. Make your own image for more advanced use.
+
+For more detailed information about the available command-line arguments, you can run the following command:
+
+```bash
+docker run --rm pdfix/html-to-pdf:latest --help
 ```
 
-Parameter --url can be real url address or path to a local HTML file mapped from the host.
+## Run OCR using REST API
+Comming soon. Please contact us.
 
-By default the container saves the PDF in /out folder in container, which should be mapped from the host. 
+### Exporting Configuration for Integration
+To export the configuration JSON file, use the following command:
+```bash
+docker run -v $(pwd):/data -w /data --rm pdfix/html-to-pdf:latest config -o config.json
+```
+
+## License & libraries used
+- PDFix SDK - https://pdfix.net/terms
+- Chromium - https://www.chromium.org/Home/
+
+Trial version of the PDFix SDK may apply a watermark on the page and redact random parts of the PDF. Contact us to get an evaluation or production license.
+
+## Help & Support
+To obtain a PDFix SDK license or report an issue please contact us at support@pdfix.net.
+For more information visit https://pdfix.net
 
