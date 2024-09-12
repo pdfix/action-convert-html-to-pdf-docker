@@ -7,10 +7,8 @@
   },
   "actions": [
     {
-      "name": "HTML to PDF",
-      "desc": "Creating PDF document from HTML.",
-      "path": "user-defined command folder",
-      "program": "html_to_pdf",
+      "name": "Convert HTML to PDF",
+      "desc": "This action converts a webpage (via URL) or an HTML file into a well-formatted PDF document. Users can input a URL or upload an HTML file, and the action will capture the content, including text, images, and layout, transforming it into a PDF.",
       "category": "Conversion",
       "stdout": "",
       "stderr": "",
@@ -19,59 +17,51 @@
       ],
       "configurations": [
         {
-          "name": "Convert url HTML to PDF.",
-          "desc": "Create PDF document from HTML url address.",
+          "name": "Convert HTML via URL to PDF.",
+          "desc": "This action converts a webpage (via URL) or an HTML file into a well-formatted PDF document. Users can input a URL, and the action will capture the content, including text, images, and layout, transforming it into a PDF.",
+          "program": "docker run --platform linux/amd64 -v ${WORKING_DIRECTORY}:/data -w /data --rm pdfix/html-to-pdf:latest html-to-pdf -i ${URL} -o $(basename ${OUTPUT_PDF}) --name ${LICENSE_NAME} --key ${LICENSE_KEY}",
           "args": [
             "---url",
-            "${URL}",
+            "${INPUT_URL}",
             "--output",
-            "${Output PDF}"
+            "${OUTPUT_PDF}"
           ]
         },
         {
+          "name": "Convert HTML file to PDF.",
+          "desc": "This action converts a webpage (via URL) or an HTML file into a well-formatted PDF document. Users can input an HTML file, and the action will transform it into a PDF.",
+          "program": "docker run --platform linux/amd64 -v ${WORKING_DIRECTORY}:/data -w /data --rm pdfix/html-to-pdf:latest html-to-pdf -i $(basename ${INPUT_HTML}) -o $(basename ${OUTPUT_PDF}) --name ${LICENSE_NAME} --key ${LICENSE_KEY}",
           "args": [
             "--input",
-            "${Input File}",
+            "${INPUT_HTML}",
             "--output",
-            "${Output PDF}"
-          ],
-          "name": "Convert index file HTML to PDF.",
-          "desc": "Create PDF document from HTML index file."
+            "${OUTPUT_PDF}"
+          ]
         }
       ],
-      "configuration": {
-        "name": "Convert HTML to PDF.",
-        "desc": "Create PDF document from HTML.",
-        "args": [
-          "---url",
-          "${URL}",
-          "--output",
-          "${Output PDF}"
-        ]
-      },
       "args": [
         {
           "name": "URL",
           "desc": "URL address.",
           "flags": 2,
-          "type": "string",
-          "value": "user-defined url address"
+          "type": "url",
+          "value": ""
         },
         {
-          "name": "Input File",
-          "desc": "HTML index file.",
-          "ext": "html",
-          "type": "file_path",
+          "name": "INPUT_HTML",
+          "desc": "HTML file.",
           "flags": 2,
-          "value": "user-defined file path"
+          "type": "file_path",
+          "ext": "html",
+          "value": ""
         },
         {
-          "name": "Output PDF",
+          "name": "OUTPUT_PDF",
           "desc": "Output PDF file.",
           "flags": 4,
+          "type": "file_path",
           "ext": "pdf",
-          "type": "file_path_save",
-          "value": "user-defined file path"
+          "value": ""
         }
       ]
     }
