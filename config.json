@@ -7,8 +7,8 @@
   },
   "actions": [
     {
-      "name": "Convert HTML to PDF",
-      "desc": "This action converts a webpage (via URL) or an HTML file into a well-formatted PDF document. Users can input a URL or upload an HTML file, and the action will capture the content, including text, images, and layout, transforming it into a PDF.",
+      "name": "HTML to PDF",
+      "desc": "This action converts a webpage (via URL) or an HTML file into a well-formatted PDF document. Users can input a URL or an HTML file, and the action will capture the content, including text, images, and layout, transforming it into a PDF.",
       "category": "Conversion",
       "stdout": "",
       "stderr": "",
@@ -17,25 +17,25 @@
       ],
       "configurations": [
         {
-          "name": "Convert HTML via URL to PDF.",
-          "desc": "This action converts a webpage (via URL) or an HTML file into a well-formatted PDF document. Users can input a URL, and the action will capture the content, including text, images, and layout, transforming it into a PDF.",
-          "program": "docker run --platform linux/amd64 -v ${WORKING_DIRECTORY}:/data -w /data --rm pdfix/html-to-pdf:latest html-to-pdf -i ${URL} -o $(basename ${OUTPUT_PDF}) --name ${LICENSE_NAME} --key ${LICENSE_KEY}",
+          "name": "URL address to PDF",
+          "desc": "Convert URL into a well-formatted PDF document.",
+          "program": "docker run --platform linux/amd64 -v ${WORKING_DIRECTORY}:/data -w /data --rm pdfix/html-to-pdf:latest html-to-pdf -i ${URL} -o $(basename ${OUTPUT_PDF})",
           "args": [
-            "---url",
-            "${INPUT_URL}",
-            "--output",
-            "${OUTPUT_PDF}"
+            "--name", 
+            "${LICENSE_NAME}", 
+            "--key",
+            "${LICENSE_KEY}"
           ]
         },
         {
-          "name": "Convert HTML file to PDF.",
-          "desc": "This action converts a webpage (via URL) or an HTML file into a well-formatted PDF document. Users can input an HTML file, and the action will transform it into a PDF.",
-          "program": "docker run --platform linux/amd64 -v ${WORKING_DIRECTORY}:/data -w /data --rm pdfix/html-to-pdf:latest html-to-pdf -i $(basename ${INPUT_HTML}) -o $(basename ${OUTPUT_PDF}) --name ${LICENSE_NAME} --key ${LICENSE_KEY}",
+          "name": "HTML file to PDF.",
+          "desc": "Convert HTML file into a well-formatted PDF document.",
+          "program": "docker run --platform linux/amd64 -v ${WORKING_DIRECTORY}:/data -w /data --rm pdfix/html-to-pdf:latest html-to-pdf -i $(basename ${INPUT_HTML}) -o $(basename ${OUTPUT_PDF})",
           "args": [
-            "--input",
-            "${INPUT_HTML}",
-            "--output",
-            "${OUTPUT_PDF}"
+            "--name", 
+            "${LICENSE_NAME}", 
+            "--key",
+            "${LICENSE_KEY}"
           ]
         }
       ],
