@@ -1,6 +1,6 @@
 {
   "name": "HTML to PDF",
-  "desc": "Action convert HTML to PDF.",
+  "desc": "Convert HTML to PDF",
   "version": {
     "major": 1,
     "minor": 0
@@ -17,47 +17,47 @@
       ],
       "configurations": [
         {
-          "name": "URL address to PDF",
+          "name": "URL to PDF",
           "desc": "Convert URL into a well-formatted PDF document.",
-          "program": "docker run --platform linux/amd64 -v ${WORKING_DIRECTORY}:/data -w /data --rm pdfix/html-to-pdf:latest html-to-pdf -i ${URL} -o $(basename ${OUTPUT_PDF})",
+          "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/html-to-pdf:latest html-to-pdf -i ${url} -o $(basename ${output_pdf})",
           "args": [
             "--name", 
-            "${LICENSE_NAME}", 
+            "${license_name}", 
             "--key",
-            "${LICENSE_KEY}"
+            "${license_key}"
           ]
         },
         {
           "name": "HTML file to PDF.",
           "desc": "Convert HTML file into a well-formatted PDF document.",
-          "program": "docker run --platform linux/amd64 -v ${WORKING_DIRECTORY}:/data -w /data --rm pdfix/html-to-pdf:latest html-to-pdf -i $(basename ${INPUT_HTML}) -o $(basename ${OUTPUT_PDF})",
+          "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/html-to-pdf:latest html-to-pdf -i $(basename ${input_html}) -o $(basename ${output_pdf})",
           "args": [
             "--name", 
-            "${LICENSE_NAME}", 
+            "${license_name}", 
             "--key",
-            "${LICENSE_KEY}"
+            "${license_key}"
           ]
         }
       ],
       "args": [
         {
-          "name": "URL",
-          "desc": "URL address.",
+          "name": "url",
+          "desc": "URL address",
           "flags": 2,
           "type": "url",
           "value": ""
         },
         {
-          "name": "INPUT_HTML",
-          "desc": "HTML file.",
+          "name": "input_html",
+          "desc": "HTML file",
           "flags": 2,
           "type": "file_path",
           "ext": "html",
           "value": ""
         },
         {
-          "name": "OUTPUT_PDF",
-          "desc": "Output PDF file.",
+          "name": "output_pdf",
+          "desc": "Output PDF file",
           "flags": 4,
           "type": "file_path",
           "ext": "pdf",
