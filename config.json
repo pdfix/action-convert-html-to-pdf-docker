@@ -1,42 +1,24 @@
 {
-  "name": "HTML to PDF",
-  "desc": "Convert HTML to PDF",
-  "version": {
-    "major": 1,
-    "minor": 0
-  },
   "actions": [
     {
       "name": "HTML to PDF",
-      "desc": "This action converts a webpage (via URL) or an HTML file into a well-formatted PDF document. Users can input a URL or an HTML file, and the action will capture the content, including text, images, and layout, transforming it into a PDF.",
+      "desc": "Convert HTML to PDF",
+      "version": {
+        "major": 1,
+        "minor": 0
+      },
+      "icon": "html",
       "category": "Conversion",
-      "stdout": "",
-      "stderr": "",
-      "returnCodes": [
-        0
-      ],
       "configurations": [
         {
           "name": "URL to PDF",
-          "desc": "Convert URL into a well-formatted PDF document.",
-          "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/html-to-pdf:latest html-to-pdf -i ${url} -o $(basename ${output_pdf})",
-          "args": [
-            "--name", 
-            "${license_name}", 
-            "--key",
-            "${license_key}"
-          ]
+          "desc": "Convert URL into a well-formatted PDF document",
+          "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf --url \"${url}\" -o \"/data/${output_pdf}\""
         },
         {
-          "name": "HTML file to PDF.",
-          "desc": "Convert HTML file into a well-formatted PDF document.",
-          "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/html-to-pdf:latest html-to-pdf -i $(basename ${input_html}) -o $(basename ${output_pdf})",
-          "args": [
-            "--name", 
-            "${license_name}", 
-            "--key",
-            "${license_key}"
-          ]
+          "name": "HTML file to PDF",
+          "desc": "Convert HTML file into a well-formatted PDF document",
+          "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"/data/${input_html}\" -o \"/data/${output_pdf}\""
         }
       ],
       "args": [
