@@ -1,10 +1,10 @@
-# HTML to PDF/UA conversion
+# HTML to PDF/UA
 
-HTML to PDF/UA conversion with Google Chrome Headless and PDFix SDK
+A Docker image that converts HTML pages to PDF/UA files using PDFix SDK and Google Headless Chrome.
 
 ## Table of Contents
 
-- [HTML to PDF/UA conversion](#html-to-pdfua-conversion)
+- [HTML to PDF/UA](#html-to-pdfua)
   - [Table of Contents](#table-of-contents)
   - [Getting Started](#getting-started)
   - [Run using Command Line Interface](#run-using-command-line-interface)
