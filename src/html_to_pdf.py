@@ -1,9 +1,11 @@
+import os
 import platform
 import subprocess
-import os
-import requests
 import sys
-import tempfile, uuid
+import tempfile
+import uuid
+
+import requests
 
 
 def setup_chrome_cli() -> str:
@@ -13,23 +15,20 @@ def setup_chrome_cli() -> str:
     if pltfm == "Darwin":
         if arch == "arm":
             return "../chrome/chrome-headless-shell-mac-arm64/chrome-headless-shell"
-        else:
-            return "../chrome/chrome-headless-shell-mac-x64/chrome-headless-shell"
-    elif pltfm == "Linux":
+        return "../chrome/chrome-headless-shell-mac-x64/chrome-headless-shell"
+    if pltfm == "Linux":
         return "../chrome/chrome-headless-shell-linux64/chrome-headless-shell"
-    elif pltfm == "Windows":
+    if pltfm == "Windows":
         return "../chrome/chrome-headless-shell-win64/chrome-headless-shell.exe"
-    else:
-        raise Exception("Unknown platform")
+    raise Exception("Unknown platform")
 
 
-def download_website(url):
+def download_website(url: str):
     response = requests.get(url, stream=True)
-    website_content = response.content
-    return website_content
+    return response.content
 
 
-def convert_to_pdf(url: str, output: str):
+def convert_to_pdf(url: str, output: str) -> None:
     if url.startswith("https://"):
         web_content = download_website(url)
     else:
@@ -40,13 +39,13 @@ def convert_to_pdf(url: str, output: str):
 
     try:
         chrome_cli = setup_chrome_cli()
-    except Exception as e:
+    except Exception:
         print("Chrome cli was not found.", file=sys.stderr)
 
     chrome_cli = os.path.normpath(dir_path + "/" + chrome_cli)
 
     # out_dir = os.path.normpath(dir_path + "/" + os.path.dirname(output))
-    out_dir = tempfile.gettempdir()
+    tempfile.gettempdir()
     # if not os.path.exists(out_dir):
     #     os.makedirs(out_dir)
 
@@ -69,7 +68,13 @@ def convert_to_pdf(url: str, output: str):
         file_path,
     ]
 
-    result = subprocess.run(args, shell=False, capture_output=True, text=True)
+    result = subprocess.run(
+        args,
+        shell=False,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
 
     if result.returncode == 0:
         print("Command executed successfully")
