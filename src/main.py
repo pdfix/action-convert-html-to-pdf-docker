@@ -46,7 +46,7 @@ def main():
         "html-to-pdf",
         help="Convert HTML to PDF document.",
     )
-    pars_html.add_argument("--input", help="URL address or local path to HTML")
+    pars_html.add_argument("-i", "--input", help="URL address or local path to HTML")
     pars_html.add_argument("-o", "--output", help="Output PDF file")
     pars_html.add_argument("--verbose", help="Print debug info", action="store_true")
     pars_html.add_argument("-v", "--version", help="Print version", action="store_true")
@@ -83,14 +83,14 @@ def main():
         if args.verbose:
             print("Running in verbose mode. Debug messages enabled.")
 
-        if args.url is None:
-            print("Missing required argument --url")
+        if args.input is None:
+            print("Missing required argument --input")
             sys.exit(1)
         if args.output is None:
             print("Missing required argument --output")
             sys.exit(1)
 
-        convert_to_pdf(args.url, args.output)
+        convert_to_pdf(args.input, args.output)
 
 
 if __name__ == "__main__":
