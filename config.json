@@ -11,11 +11,6 @@
       "category": "Conversion",
       "configurations": [
         {
-          "name": "URL to PDF/UA",
-          "desc": "Convert URL to PDF/UA",
-          "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf --url \"${url}\" -o \"/data/${output_pdf}\""
-        },
-        {
           "name": "HTML File to PDF/UA",
           "desc": "Convert HTML page to PDF/UA",
           "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"/data/${input_html}\" -o \"/data/${output_pdf}\""
