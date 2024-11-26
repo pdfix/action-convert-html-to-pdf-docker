@@ -21,10 +21,10 @@ To use this Docker application, you'll need to have Docker installed on your sys
 
 ## Run using Command Line Interface
 
-To run docker container as CLI you should share the folder with html file to process using `--url` parameter. In this example it's current folder. The url can be local html file or URL address.
+To run docker container as CLI you should share the folder with html file to process using `-i` parameter. In this example it's current folder. The url can be local html file or URL address.
 
 ```bash
-docker run -v $(pwd):/data/ -w /data/ pdfix/html-to-pdf:latest html-to-pdf --url index.html -o convert.pdf
+docker run -v $(pwd):/data/ -w /data/ pdfix/html-to-pdf:latest html-to-pdf -i index.html -o convert.pdf
 ```
 
 With PDFix License add these arguments. 
