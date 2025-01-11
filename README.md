@@ -1,10 +1,10 @@
-# HTML to PDF/UA
+# HTML to PDF
 
-A Docker image that converts HTML pages to PDF/UA files using PDFix SDK and Google Headless Chrome.
+A Docker image action that converts HTML pages to PDF files using PDFix SDK and Google Headless Chrome.
 
 ## Table of Contents
 
-- [HTML to PDF/UA](#html-to-pdfua)
+- [HTML to PDF](#html-to-pdf)
   - [Table of Contents](#table-of-contents)
   - [Getting Started](#getting-started)
   - [Run using Command Line Interface](#run-using-command-line-interface)
@@ -17,12 +17,9 @@ A Docker image that converts HTML pages to PDF/UA files using PDFix SDK and Goog
 
 To use this Docker application, you'll need to have Docker installed on your system. If Docker is not installed, please follow the instructions on the [official Docker website](https://docs.docker.com/get-docker/) to install it.
 
-
-
 ## Run using Command Line Interface
 
 To run docker container as CLI you should share the folder with html file to process using `-i` parameter. In this example it's current folder. The url can be local html file or URL address.
-
 ```bash
 docker run -v $(pwd):/data/ -w /data/ pdfix/html-to-pdf:latest html-to-pdf -i index.html -o convert.pdf
 ```
