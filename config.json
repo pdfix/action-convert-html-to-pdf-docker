@@ -1,8 +1,8 @@
 {
   "actions": [
     {
-      "name": "HTML to PDF/UA",
-      "desc": "A Docker image that converts HTML pages to PDF/UA files using PDFix SDK and Google Headless Chrome",
+      "name": "HTML to PDF",
+      "desc": "A Docker image that converts HTML pages to PDF files using PDFix SDK and Google Headless Chrome",
       "version": {
         "major": 1,
         "minor": 0
@@ -11,13 +11,13 @@
       "category": "Conversion",
       "configurations": [
         {
-          "name": "URL to PDF/UA",
-          "desc": "Convert URL to PDF/UA",
+          "name": "URL to PDF",
+          "desc": "Convert URL to PDF",
           "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"${url}\" -o \"/data/${output_pdf}\""
         },
         {
-          "name": "HTML File to PDF/UA",
-          "desc": "Convert HTML page to PDF/UA",
+          "name": "HTML File to PDF",
+          "desc": "Convert HTML page to PDF",
           "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"/data/${input_html}\" -o \"/data/${output_pdf}\""
         }
       ],
