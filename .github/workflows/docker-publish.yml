@@ -10,7 +10,7 @@ on:
 
 env:
   DOCKER_HUB_NAMESPACE: pdfix
-  DOCKER_HUB_REPOSITORY: html-to-pdf
+  DOCKER_HUB_REPOSITORY: convert-html-to-pdf
 
 jobs:
   push_to_registry:
