@@ -1,49 +1,56 @@
 {
-  "actions": [
-    {
-      "name": "Convert HTML to PDF",
-      "desc": "A Docker image that converts HTML pages to PDF files using PDFix SDK and Google Headless Chrome",
-      "version": "v1.0.0",
-      "icon": "html",
-      "category": "Conversion",
-      "configurations": [
+    "actions": [
         {
-          "name": "URL to PDF",
-          "desc": "Convert URL to PDF",
-          "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"${url}\" -o \"/data/${output_pdf}\""
+            "name": "Convert HTML to PDF",
+            "desc": "A Docker image that converts HTML pages to PDF",
+            "version": "v1.0.0",
+            "icon": "html",
+            "category": "Conversion",
+            "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"/data/${input_html}\" -o \"/data/${output_pdf}\"",
+            "args": [
+                {
+                    "name": "input_html",
+                    "desc": "HTML file",
+                    "flags": 2,
+                    "type": "file_path",
+                    "ext": "html",
+                    "value": ""
+                },
+                {
+                    "name": "output_pdf",
+                    "desc": "Output PDF file",
+                    "flags": 4,
+                    "type": "file_path",
+                    "ext": "pdf",
+                    "value": ""
+                }
+            ]
         },
         {
-          "name": "HTML File to PDF",
-          "desc": "Convert HTML page to PDF",
-          "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"/data/${input_html}\" -o \"/data/${output_pdf}\""
+            "name": "Convert URL to PDF",
+            "desc": "A Docker image that converts URL address to PDF",
+            "version": "v1.0.0",
+            "icon": "html",
+            "category": "Conversion",
+            "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"${url}\" -o \"/data/${output_pdf}\"",
+            "args": [
+                {
+                    "title": "URL Address",
+                    "name": "url",
+                    "desc": "URL Address",
+                    "flags": 2,
+                    "type": "url",
+                    "value": ""
+                },
+                {
+                    "name": "output_pdf",
+                    "desc": "Output PDF file",
+                    "flags": 4,
+                    "type": "file_path",
+                    "ext": "pdf",
+                    "value": ""
+                }
+            ]
         }
-      ],
-      "args": [
-        {
-          "title": "URL Address",
-          "name": "url",
-          "desc": "URL Address",
-          "flags": 2,
-          "type": "url",
-          "value": ""
-        },
-        {
-          "name": "input_html",
-          "desc": "HTML file",
-          "flags": 2,
-          "type": "file_path",
-          "ext": "html",
-          "value": ""
-        },
-        {
-          "name": "output_pdf",
-          "desc": "Output PDF file",
-          "flags": 4,
-          "type": "file_path",
-          "ext": "pdf",
-          "value": ""
-        }
-      ]
-    }
-  ]
+    ]
 }
