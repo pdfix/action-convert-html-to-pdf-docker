@@ -2,15 +2,15 @@
     "actions": [
         {
             "name": "Convert HTML to PDF",
-            "desc": "A Docker image that converts HTML pages to PDF",
+            "desc": "Converts HTML to PDF",
             "version": "v1.0.0",
-            "icon": "html",
+            "icon": "html_to_pdf",
             "category": "Conversion",
             "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"/data/${input_html}\" -o \"/data/${output_pdf}\"",
             "args": [
                 {
                     "name": "input_html",
-                    "desc": "HTML file",
+                    "desc": "Input HTML file",
                     "flags": 2,
                     "type": "file_path",
                     "ext": "html",
@@ -28,16 +28,15 @@
         },
         {
             "name": "Convert URL to PDF",
-            "desc": "A Docker image that converts URL address to PDF",
+            "desc": "Converts URL to PDF",
             "version": "v1.0.0",
-            "icon": "html",
+            "icon": "url_to_pdf",
             "category": "Conversion",
             "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"${url}\" -o \"/data/${output_pdf}\"",
             "args": [
                 {
-                    "title": "URL Address",
                     "name": "url",
-                    "desc": "URL Address",
+                    "desc": "Input URL address",
                     "flags": 2,
                     "type": "url",
                     "value": ""
