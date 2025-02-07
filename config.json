@@ -1,9 +1,10 @@
 {
+    "version": "v0.0.0",
     "actions": [
         {
             "name": "Convert HTML to PDF",
             "desc": "Converts HTML to PDF",
-            "version": "v1.0.0",
+            "version": "v0.0.0",
             "icon": "html_to_pdf",
             "category": "Conversion",
             "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"/data/${input_html}\" -o \"/data/${output_pdf}\"",
@@ -29,7 +30,7 @@
         {
             "name": "Convert URL to PDF",
             "desc": "Converts URL to PDF",
-            "version": "v1.0.0",
+            "version": "v0.0.0",
             "icon": "url_to_pdf",
             "category": "Conversion",
             "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"${url}\" -o \"/data/${output_pdf}\"",
