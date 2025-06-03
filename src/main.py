@@ -1,96 +1,131 @@
 import argparse
 import json
 import os
-import shutil
 import sys
+import traceback
 from pathlib import Path
 
 from html_to_pdf import convert_to_pdf
 
 
-def get_config(path) -> None:
-    if path is None:
-        with open(
-            os.path.join(Path(__file__).parent.absolute(), "../config.json"),
-            "r",
-            encoding="utf-8",
-        ) as f:
-            print(f.read())
+def set_arguments(
+    parser: argparse.ArgumentParser, names: list, required_output: bool = True, output_help: str = ""
+) -> None:
+    """
+    Set arguments for the parser based on the provided names and options.
+
+    Args:
+        parser (argparse.ArgumentParser): The argument parser to set arguments for.
+        names (list): List of argument names to set.
+        required_output (bool): Whether the output argument is required. Defaults to True.
+        output_help (str): Help shown for output argument. Defaults to "".
+    """
+    for name in names:
+        match name:
+            case "input":
+                parser.add_argument("--input", "-i", type=str, required=True, help="The URL or input HTML file")
+            case "key":
+                parser.add_argument("--key", type=str, help="PDFix license key")
+            case "name":
+                parser.add_argument("--name", type=str, help="PDFix license name")
+            case "output":
+                parser.add_argument("--output", "-o", type=str, required=required_output, help=output_help)
+            case "version":
+                parser.add_argument("--version", "-v", help="Print version", action="store_true")
+
+
+def run_config_subcommand(args) -> None:
+    get_pdfix_config(args.output)
+
+
+def get_pdfix_config(path: str) -> None:
+    """
+    If Path is not provided, output content of config.
+    If Path is provided, copy config to destination path.
+
+    Args:
+        path (string): Destination path for config.json file
+    """
+    config_path = os.path.join(Path(__file__).parent.absolute(), "../config.json")
+
+    with open(config_path, "r", encoding="utf-8") as file:
+        if path is None:
+            print(file.read())
+        else:
+            with open(path, "w") as out:
+                out.write(file.read())
+
+
+def run_html_to_pdf_subcommand(args) -> None:
+    if args.version:
+        print_version()
     else:
-        src = os.path.join(Path(__file__).parent.absolute(), "../config.json")
-        dst = path
-        shutil.copyfile(src, dst)
+        html_to_pdf(args.input, args.output)
+
+
+def print_version() -> None:
+    """
+    Prints version found in config.json file.
+    """
+    config_path = os.path.join(Path(__file__).parent.absolute(), "../config.json")
+    with open(config_path, "r", encoding="utf-8") as file:
+        data = json.load(file)
+        if "version" in data:
+            # Skip "v:" from "version" data
+            print(f"Version: {data['version'][2:]}")
+
+
+def html_to_pdf(url: str, output_path: str) -> None:
+    """
+    Converts HTML page (found in URL or file system) to PDF document.
+
+    Args:
+        url (str): URL or path to file.
+        output_path (str): Path to output PDF document
+    """
+    convert_to_pdf(url, output_path)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--name", type=str, default="", help="license name")
-    parser.add_argument("--key", type=str, default="", help="license key")
 
     subparsers = parser.add_subparsers(dest="subparser")
 
-    # config subparser
-    pars_config = subparsers.add_parser(
-        "config", help="Extract config file for integration"
+    # Config subcommand
+    config_parser = subparsers.add_parser("config", help="Save the default configuration file")
+    set_arguments(
+        config_parser,
+        ["output"],
+        False,
+        "Output to save the config JSON file. Application output is used if not provided",
     )
-    pars_config.add_argument(
-        "-o",
-        "--output",
-        type=str,
-        help="Output to save the config JSON file.\
-              Application output is used if not provided",
-    )
+    config_parser.set_defaults(func=run_config_subcommand)
 
-    # html-to-pdf subparser
-    pars_html = subparsers.add_parser(
+    # Html to pdf subcommand
+    html_to_pdf_parser = subparsers.add_parser(
         "html-to-pdf",
         help="Convert HTML to PDF document.",
     )
-    pars_html.add_argument("-i", "--input", help="URL address or local path to HTML")
-    pars_html.add_argument("-o", "--output", help="Output PDF file")
-    pars_html.add_argument("--verbose", help="Print debug info", action="store_true")
-    pars_html.add_argument("-v", "--version", help="Print version", action="store_true")
-    args = parser.parse_args()
+    set_arguments(html_to_pdf_parser, ["input", "output", "version"], True, "Output PDF file")
+    html_to_pdf_parser.set_defaults(func=run_html_to_pdf_subcommand)
 
-    if args.subparser == "config":
-        get_config(args.output)
-        sys.exit(0)
+    # Parse arguments
+    try:
+        args = parser.parse_args()
+    except SystemExit as e:
+        if e.code == 0:
+            # This happens when --help is used, exit gracefully
+            sys.exit(0)
+        print("Failed to parse arguments. Please check the usage and try again.", file=sys.stderr)
+        sys.exit(1)
 
-    elif args.subparser == "html-to-pdf":
-        if args.version:
-            try:
-                config_path = "config.json"
-                with open(config_path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-
-                    if "version" in data:
-                        version_info = data["version"]
-                        major = version_info.get("major")
-                        minor = version_info.get("minor")
-                        patch = version_info.get("patch")
-
-                    print("Version: {}.{}.{}".format(major, minor, patch))
-                sys.exit(0)
-            except FileNotFoundError:
-                print(
-                    "Failed to get version information. Missing {} file.".format(
-                        config_path,
-                    ),
-                    file=sys.stderr,
-                )
-                sys.exit(1)
-
-        if args.verbose:
-            print("Running in verbose mode. Debug messages enabled.")
-
-        if args.input is None:
-            print("Missing required argument --input")
-            sys.exit(1)
-        if args.output is None:
-            print("Missing required argument --output")
-            sys.exit(1)
-
-        convert_to_pdf(args.input, args.output)
+    # Run subcommand
+    try:
+        args.func(args)
+    except Exception as e:
+        print(traceback.format_exc(), file=sys.stderr)
+        print(f"Failed to run the program: {e}", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
