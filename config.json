@@ -1,4 +1,5 @@
 {
+    "name": "Convert to PDF",
     "version": "v0.0.0",
     "actions": [
         {
@@ -7,7 +8,7 @@
             "version": "v0.0.0",
             "icon": "html_to_pdf",
             "category": "Conversion",
-            "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"/data/${input_html}\" -o \"/data/${output_pdf}\"",
+            "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest html-to-pdf --name \"${license_name}\" --key \"${license_key}\" -i \"/data/${input_html}\" -o \"/data/${output_pdf}\"",
             "args": [
                 {
                     "name": "input_html",
@@ -33,7 +34,7 @@
             "version": "v0.0.0",
             "icon": "url_to_pdf",
             "category": "Conversion",
-            "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest --name \"${license_name}\" --key \"${license_key}\" html-to-pdf -i \"${url}\" -o \"/data/${output_pdf}\"",
+            "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest html-to-pdf --name \"${license_name}\" --key \"${license_key}\" -i \"${url}\" -o \"/data/${output_pdf}\"",
             "args": [
                 {
                     "name": "url",
