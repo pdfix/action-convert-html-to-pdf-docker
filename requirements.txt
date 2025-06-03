@@ -1,10 +1,2 @@
-altgraph==0.17.4
-certifi==2024.2.2
-charset-normalizer==3.3.2
-idna==3.6
-packaging==24.0
-pyinstaller==5.13.2
-pyinstaller-hooks-contrib==2024.3
 requests==2.31.0
-tqdm==4.66.2
-urllib3==2.2.1
+types-requests==2.32.0.20250602
