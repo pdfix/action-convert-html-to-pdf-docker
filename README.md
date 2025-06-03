@@ -24,11 +24,6 @@ To run docker container as CLI you should share the folder with html file to pro
 docker run -v $(pwd):/data/ -w /data/ pdfix/html-to-pdf:latest html-to-pdf -i index.html -o convert.pdf
 ```
 
-With PDFix License add these arguments. 
-```bash
---name ${LICENSE_NAME} --key ${LICENSE_KEY}
-```
-
 First run will pull the docker image, which may take some time. Make your own image for more advanced use.
 
 For more detailed information about the available command-line arguments, you can run the following command:
@@ -47,10 +42,7 @@ docker run -v $(pwd):/data -w /data --rm pdfix/html-to-pdf:latest config -o conf
 ```
 
 ## License & libraries used
-- PDFix SDK - https://pdfix.net/terms
 - Chromium - https://www.chromium.org/Home/
-
-Trial version of the PDFix SDK may apply a watermark on the page and redact random parts of the PDF. Contact us to get an evaluation or production license.
 
 ## Help & Support
 To obtain a PDFix SDK license or report an issue please contact us at support@pdfix.net.
