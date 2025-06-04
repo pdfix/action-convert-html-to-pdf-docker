@@ -1,7 +1,6 @@
 import os
 import platform
 import subprocess
-import sys
 import tempfile
 import uuid
 from typing import Any
@@ -67,8 +66,8 @@ def convert_to_pdf(url: str, output: str) -> None:
 
     chrome_cli = os.path.normpath(dir_path + "/" + chrome_cli)
 
-    with tempfile.gettempdir() as tempdir:
-        file_path = tempdir + str(uuid.uuid4()) + ".html"
+    with tempfile.TemporaryDirectory() as tempdir:
+        file_path = os.path.join(tempdir, str(uuid.uuid4()) + ".html")
 
         with open(file_path, "wb") as f:
             f.write(web_content)
@@ -95,7 +94,7 @@ def convert_to_pdf(url: str, output: str) -> None:
             if result.returncode == 0:
                 print("Command executed successfully")
             else:
-                raise Exception(f"Error: {result.stderr}", file=sys.stderr)
+                raise Exception(f"Error: {result.stderr}")
         except Exception:
             raise
         finally:
