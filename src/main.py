@@ -6,6 +6,7 @@ import traceback
 from pathlib import Path
 
 from html_to_pdf import convert_to_pdf
+from image_update import DockerImageContainerUpdateChecker
 
 
 def set_arguments(
@@ -118,6 +119,10 @@ def main():
             sys.exit(0)
         print("Failed to parse arguments. Please check the usage and try again.", file=sys.stderr)
         sys.exit(e.code)
+
+    # Update of docker image checker
+    update_checker = DockerImageContainerUpdateChecker()
+    update_checker.check_for_image_updates()
 
     if hasattr(args, "func"):
         # Run subcommand
