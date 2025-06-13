@@ -1,5 +1,5 @@
 beautifulsoup4==4.12.3
-requests==2.31.0
+requests==2.32.4
 tqdm==4.66.2
 types-requests==2.32.0.20250602
 urllib3==2.2.1
