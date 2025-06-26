@@ -54,14 +54,30 @@ else
     EXIT_STATUS=1
 fi
 
-info "Test #03: Run html-to-pdf"
-docker run --rm $PLATFORM -v $(pwd):/data -w /data $DOCKER_IMAGE html-to-pdf --url https://pdfix.net -o $TEMPORARY_DIRECTORY/pdfix.net.pdf --verbose > /dev/null
+info "Test #03: Run html-to-pdf for URL"
+docker run --rm $PLATFORM -v $(pwd):/data -w /data $DOCKER_IMAGE html-to-pdf -i https://pdfix.net -o $TEMPORARY_DIRECTORY/pdfix.net.pdf > /dev/null
 if [ -f "$(pwd)/$TEMPORARY_DIRECTORY/pdfix.net.pdf" ]; then
     success "passed"
 else
-    error "html-to-pdf to pdf failed on https://pdfix.net"
+    error "html-to-pdf for URL failed on https://pdfix.net"
     EXIT_STATUS=1
 fi
+
+
+info "Test #04: Run html-to-pdf for html file"
+docker run --rm $PLATFORM -v $(pwd):/data -w /data $DOCKER_IMAGE html-to-pdf -i example/pdfix.html -o $TEMPORARY_DIRECTORY/pdfix.html.pdf > /dev/null
+if [ -f "$(pwd)/$TEMPORARY_DIRECTORY/pdfix.html.pdf" ]; then
+    success "passed"
+else
+    error "html-to-pdf for html file failed on example/pdfix.html"
+    EXIT_STATUS=1
+fi
+
+info "Cleaning up temporary files from tests"
+rm -f $TEMPORARY_DIRECTORY/config.json
+rm -f $TEMPORARY_DIRECTORY/pdfix.net.pdf
+rm -f $TEMPORARY_DIRECTORY/pdfix.html.pdf
+rmdir $(pwd)/$TEMPORARY_DIRECTORY
 
 info "Removing testing docker image"
 docker rmi $DOCKER_IMAGE
