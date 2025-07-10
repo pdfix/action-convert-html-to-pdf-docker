@@ -5,10 +5,11 @@
         {
             "title": "Convert HTML to PDF",
             "name": "pdfix_convert_html_to_pdf_chrome",
-            "desc": "Converts HTML to PDF",
+            "desc": "Converts HTML to PDF [Local]",
             "version": "v0.0.0",
             "icon": "html_to_pdf",
             "category": "Conversion",
+            "local": "True",
             "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest html-to-pdf --name \"${license_name}\" --key \"${license_key}\" -i \"/data/${input_html}\" -o \"/data/${output_pdf}\"",
             "args": [
                 {
@@ -32,10 +33,11 @@
         {
             "title": "Convert URL to PDF",
             "name": "pdfix_convert_url_to_pdf_chrome",
-            "desc": "Converts URL to PDF",
+            "desc": "Converts URL to PDF [Local]",
             "version": "v0.0.0",
             "icon": "url_to_pdf",
             "category": "Conversion",
+            "local": "True",
             "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest html-to-pdf --name \"${license_name}\" --key \"${license_key}\" -i \"${url}\" -o \"/data/${output_pdf}\"",
             "args": [
                 {
