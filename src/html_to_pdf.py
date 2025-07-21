@@ -16,16 +16,23 @@ def setup_chrome_cli() -> str:
         Path to proper executable for chrome.
     """
     pltfm = platform.system()
-    arch = platform.processor()
 
-    if pltfm == "Darwin":
-        if arch == "arm":
-            return "../chrome/chrome-headless-shell-mac-arm64/chrome-headless-shell"
-        return "../chrome/chrome-headless-shell-mac-x64/chrome-headless-shell"
-    if pltfm == "Linux":
-        return "../chrome/chrome-headless-shell-linux64/chrome-headless-shell"
     if pltfm == "Windows":
-        return "../chrome/chrome-headless-shell-win64/chrome-headless-shell.exe"
+        windows_exe = "../chrome/chrome-headless-shell-win64/chrome-headless-shell.exe"
+        return windows_exe
+
+    if pltfm == "Linux" or pltfm == "Darwin":
+        # On minimal docker images this returns empty string
+        # arch = platform.processor()
+
+        arch = subprocess.check_output(["uname", "-m"], text=True).strip()
+        uname_arch_mac_arm64 = "aarch64"
+        linux_x64 = "../chrome/chrome-headless-shell-linux64/chrome-headless-shell"
+        mac_arm64 = "../chrome/chrome-headless-shell-mac-arm64/chrome-headless-shell"
+
+        chrome_path = mac_arm64 if arch == uname_arch_mac_arm64 else linux_x64
+        return chrome_path
+
     raise Exception("Unknown platform")
 
 
