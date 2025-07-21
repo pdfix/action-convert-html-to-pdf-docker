@@ -26,10 +26,6 @@ def set_arguments(
         match name:
             case "input":
                 parser.add_argument("--input", "-i", type=str, required=True, help="The URL or input HTML file")
-            case "key":
-                parser.add_argument("--key", type=str, default="", nargs="?", help="PDFix license key")
-            case "name":
-                parser.add_argument("--name", type=str, default="", nargs="?", help="PDFix license name")
             case "output":
                 parser.add_argument("--output", "-o", type=str, required=required_output, help=output_help)
             case "version":
