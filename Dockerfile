@@ -25,9 +25,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 
 # Download chrome
-COPY download_chrome.sh /usr/html-to-pdf/
-RUN chmod +x download_chrome.sh
-RUN /usr/html-to-pdf/download_chrome.sh
+ARG TARGETARCH
+ENV TARGETARCH=${TARGETARCH}
+COPY download_chrome_docker.sh /usr/html-to-pdf/
+RUN chmod +x download_chrome_docker.sh && \
+    ./download_chrome_docker.sh $TARGETARCH
 
 
 # Copy the source code
