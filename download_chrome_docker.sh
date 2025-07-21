@@ -15,7 +15,7 @@ case "$ARCH" in
     url="https://storage.googleapis.com/chrome-for-testing-public/$version/linux64/chrome-headless-shell-linux64.zip"
     ;;
   arm64)
-    url="https://storage.googleapis.com/chrome-for-testing-public/$version/mac-arm64/chrome-headless-shell-mac-arm64.zip"
+  	url=https://storage.googleapis.com/chrome-for-testing-public/$version/linux-arm64/chrome-headless-shell-linux-arm64.zip
     ;;
   *)
     echo "Unsupported architecture: $ARCH"

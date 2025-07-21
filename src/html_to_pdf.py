@@ -26,11 +26,11 @@ def setup_chrome_cli() -> str:
         # arch = platform.processor()
 
         arch = subprocess.check_output(["uname", "-m"], text=True).strip()
-        uname_arch_mac_arm64 = "aarch64"
-        linux_x64 = "../chrome/chrome-headless-shell-linux64/chrome-headless-shell"
-        mac_arm64 = "../chrome/chrome-headless-shell-mac-arm64/chrome-headless-shell"
+        uname_aarch64 = "aarch64"
+        linux_amd64 = "../chrome/chrome-headless-shell-linux64/chrome-headless-shell"
+        linux_arm64 = "../chrome/chrome-headless-shell-linux-arm64/chrome-headless-shell"
 
-        chrome_path = mac_arm64 if arch == uname_arch_mac_arm64 else linux_x64
+        chrome_path = linux_arm64 if arch == uname_aarch64 else linux_amd64
         return chrome_path
 
     raise Exception("Unknown platform")
