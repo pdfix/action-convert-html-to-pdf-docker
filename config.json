@@ -10,7 +10,7 @@
             "icon": "html_to_pdf",
             "category": "Conversion",
             "local": "True",
-            "program": "docker run -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest html-to-pdf -i \"/data/${input_html}\" -o \"/data/${output_pdf}\"",
+            "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest html-to-pdf -i \"/data/${input_html}\" -o \"/data/${output_pdf}\"",
             "args": [
                 {
                     "name": "input_html",
@@ -38,7 +38,7 @@
             "icon": "url_to_pdf",
             "category": "Conversion",
             "local": "True",
-            "program": "docker run -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest html-to-pdf -i \"${url}\" -o \"/data/${output_pdf}\"",
+            "program": "docker run --platform linux/amd64 -v ${working_directory}:/data -w /data --rm pdfix/convert-html-to-pdf:latest html-to-pdf -i \"${url}\" -o \"/data/${output_pdf}\"",
             "args": [
                 {
                     "name": "url",
