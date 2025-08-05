@@ -61,7 +61,7 @@ jobs:
         id: push
         uses: docker/build-push-action@v6
         with:
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64 #,linux/arm64 # Chrome does not exists for linux/arm64 do not even build it
           context: .
           file: ./Dockerfile
           push: true
