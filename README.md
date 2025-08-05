@@ -9,6 +9,7 @@ A Docker image action that converts HTML pages to PDF files using PDFix SDK and 
   - [Getting Started](#getting-started)
   - [Run using Command Line Interface](#run-using-command-line-interface)
   - [Exporting Configuration for Integration](#exporting-configuration-for-integration)
+  - [Available Chrome Versions](#available-chrome-versions)
   - [License \& libraries used](#license--libraries-used)
   - [Help \& Support](#help--support)
 
@@ -39,6 +40,10 @@ To export the configuration JSON file, use the following command:
 ```bash
 docker run -v $(pwd):/data -w /data --rm pdfix/html-to-pdf:latest config -o config.json
 ```
+
+## Available Chrome Versions
+
+[Chrome for Testing availability](https://googlechromelabs.github.io/chrome-for-testing/)
 
 ## License & libraries used
 
