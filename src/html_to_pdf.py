@@ -52,7 +52,9 @@ def convert_to_pdf(url: str, output: str) -> None:
         output (str): Path to output PDF document.
     """
     if url.startswith("https://"):
+        print("Webpage starting downloading...")
         web_content = download_website(url)
+        print("Webpage downloaded")
     else:
         with open(url, "rb") as file:
             web_content = file.read()
@@ -72,6 +74,8 @@ def convert_to_pdf(url: str, output: str) -> None:
         with open(file_path, "wb") as f:
             f.write(web_content)
 
+        print("Webpage saved into container")
+
         try:
             name = output
             command = [
@@ -82,6 +86,8 @@ def convert_to_pdf(url: str, output: str) -> None:
                 "--no-sandbox",
                 file_path,
             ]
+            full_command = " ".join(command)
+            print(f"Executing chrome command: '{full_command}'")
 
             result = subprocess.run(
                 command,
@@ -90,6 +96,8 @@ def convert_to_pdf(url: str, output: str) -> None:
                 text=True,
                 check=False,
             )
+
+            print(f"Command ended with code {result.returncode}")
 
             if result.returncode == 0:
                 print("Command executed successfully")
