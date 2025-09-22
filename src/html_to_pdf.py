@@ -39,7 +39,23 @@ def download_website(url: str) -> bytes | Any:
     Returns:
         Content of website as bytes.
     """
-    response = requests.get(url, stream=True)
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()  # Raises HTTPError for 4xx or 5xx
+        print("Download successful")
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP error: {e}")
+        raise
+    except requests.exceptions.ConnectionError as e:
+        print(f"Connection error: {e}")
+        raise
+    except requests.exceptions.Timeout as e:
+        print(f"Timeout error: {e}")
+        raise
+    except requests.exceptions.RequestException as e:
+        # Generic catch-all for requests exceptions
+        print(f"Request failed: {e}")
+        raise
     return response.content
 
 
@@ -51,13 +67,14 @@ def convert_to_pdf(url: str, output: str) -> None:
         url (str): URL to website.
         output (str): Path to output PDF document.
     """
-    if url.startswith("https://"):
+    if os.path.isfile(url):
+        print("Reading local file...")
+        with open(url, "rb") as file:
+            web_content = file.read()
+    else:
         print("Webpage starting downloading...")
         web_content = download_website(url)
         print("Webpage downloaded")
-    else:
-        with open(url, "rb") as file:
-            web_content = file.read()
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
