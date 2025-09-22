@@ -3,7 +3,7 @@ import platform
 import subprocess
 import tempfile
 import uuid
-from typing import Any
+from typing import Optional
 
 import requests
 
@@ -29,7 +29,7 @@ def setup_chrome_cli() -> str:
     raise Exception("Unknown platform")
 
 
-def download_website(url: str) -> bytes | Any:
+def download_website(url: str) -> bytes:
     """
     Downloads content of website page into bytes.
 
@@ -39,24 +39,45 @@ def download_website(url: str) -> bytes | Any:
     Returns:
         Content of website as bytes.
     """
+    first_exception: Optional[Exception] = None
+
+    for url_attempt in [url, f"https://{url}", f"http://{url}"]:
+        content, exception = try_download_url(url_attempt)
+        if content:
+            return content
+        if exception and not first_exception:
+            first_exception = exception
+
+    if first_exception:
+        raise first_exception
+
+    raise Exception("Failed to download content from all URL attempts.")
+
+
+def try_download_url(url: str) -> tuple[Optional[bytes], Optional[Exception]]:
+    """
+    Tries to download content from URL.
+
+    Args:
+        url (str): URL to website.
+
+    Returns:
+        Tuple of content as bytes or None, and exception if occurred.
+    """
     try:
         response = requests.get(url, stream=True)
         response.raise_for_status()  # Raises HTTPError for 4xx or 5xx
-        print("Download successful")
     except requests.exceptions.HTTPError as e:
-        print(f"HTTP error: {e}")
-        raise
+        return (None, e)
     except requests.exceptions.ConnectionError as e:
-        print(f"Connection error: {e}")
-        raise
+        return (None, e)
     except requests.exceptions.Timeout as e:
-        print(f"Timeout error: {e}")
-        raise
+        return (None, e)
     except requests.exceptions.RequestException as e:
-        # Generic catch-all for requests exceptions
-        print(f"Request failed: {e}")
-        raise
-    return response.content
+        return (None, e)
+    if isinstance(response.content, bytes):
+        return (response.content, None)
+    return (None, None)
 
 
 def convert_to_pdf(url: str, output: str) -> None:
@@ -70,7 +91,7 @@ def convert_to_pdf(url: str, output: str) -> None:
     if os.path.isfile(url):
         print("Reading local file...")
         with open(url, "rb") as file:
-            web_content = file.read()
+            web_content: bytes = file.read()
     else:
         print("Webpage starting downloading...")
         web_content = download_website(url)
@@ -79,14 +100,14 @@ def convert_to_pdf(url: str, output: str) -> None:
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
     try:
-        chrome_cli = setup_chrome_cli()
+        chrome_cli: str = setup_chrome_cli()
     except Exception:
         raise Exception("Chrome cli was not found.")
 
     chrome_cli = os.path.normpath(dir_path + "/" + chrome_cli)
 
     with tempfile.TemporaryDirectory() as tempdir:
-        file_path = os.path.join(tempdir, str(uuid.uuid4()) + ".html")
+        file_path: str = os.path.join(tempdir, str(uuid.uuid4()) + ".html")
 
         with open(file_path, "wb") as f:
             f.write(web_content)
@@ -94,19 +115,19 @@ def convert_to_pdf(url: str, output: str) -> None:
         print("Webpage saved into container")
 
         try:
-            name = output
+            name: str = output
             command = [
                 chrome_cli,
                 "--headless",
-                "--print-to-pdf=" + name,
+                f"--print-to-pdf={name}",
                 "--disable-gpu",
                 "--no-sandbox",
                 file_path,
             ]
-            full_command = " ".join(command)
+            full_command: str = " ".join(command)
             print(f"Executing chrome command: '{full_command}'")
 
-            result = subprocess.run(
+            result: subprocess.CompletedProcess[str] = subprocess.run(
                 command,
                 shell=False,
                 capture_output=True,
