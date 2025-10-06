@@ -1,7 +1,6 @@
 {
     "name": "Convert to PDF",
     "version": "v0.0.0",
-    "size": "338.54 MB",
     "actions": [
         {
             "title": "Convert HTML to PDF",
