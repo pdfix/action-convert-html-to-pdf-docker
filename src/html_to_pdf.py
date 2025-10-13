@@ -1,11 +1,14 @@
 import os
 import platform
 import subprocess
+import sys
 import tempfile
 import uuid
 from typing import Optional
 
 import requests
+
+from exceptions import FailedToConvertException, FailedToDownloadException
 
 
 def setup_chrome_cli() -> str:
@@ -88,21 +91,26 @@ def convert_to_pdf(url: str, output: str) -> None:
         url (str): URL to website.
         output (str): Path to output PDF document.
     """
-    if os.path.isfile(url):
-        print("Reading local file...")
-        with open(url, "rb") as file:
-            web_content: bytes = file.read()
-    else:
-        print("Webpage starting downloading...")
-        web_content = download_website(url)
-        print("Webpage downloaded")
+    try:
+        if os.path.isfile(url):
+            print("Reading local file...")
+            with open(url, "rb") as file:
+                web_content: bytes = file.read()
+        else:
+            print("Webpage starting downloading...")
+            web_content = download_website(url)
+            print("Webpage downloaded")
+    except Exception as e:
+        print(e, file=sys.stderr)
+        raise FailedToDownloadException()
 
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
     try:
         chrome_cli: str = setup_chrome_cli()
     except Exception:
-        raise Exception("Chrome cli was not found.")
+        print("Chrome cli was not found.", file=sys.stderr)
+        raise FailedToConvertException()
 
     chrome_cli = os.path.normpath(dir_path + "/" + chrome_cli)
 
@@ -142,7 +150,7 @@ def convert_to_pdf(url: str, output: str) -> None:
             else:
                 raise Exception(f"Error: {result.stderr}")
         except Exception:
-            raise
+            raise FailedToConvertException()
         finally:
             if os.path.exists(file_path):
                 os.remove(file_path)

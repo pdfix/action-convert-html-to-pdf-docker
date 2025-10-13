@@ -6,6 +6,7 @@ import threading
 import traceback
 from pathlib import Path
 
+from exceptions import EC_ARG_GENERAL, MESSAGE_ARG_GENERAL, ExpectedException
 from html_to_pdf import convert_to_pdf
 from image_update import DockerImageContainerUpdateChecker
 
@@ -111,11 +112,11 @@ def main():
     try:
         args = parser.parse_args()
     except SystemExit as e:
-        if e.code == 0:
-            # This happens when --help is used, exit gracefully
-            sys.exit(0)
-        print("Failed to parse arguments. Please check the usage and try again.", file=sys.stderr)
-        sys.exit(e.code)
+        if e.code != 0:
+            print(MESSAGE_ARG_GENERAL, file=sys.stderr)
+            sys.exit(EC_ARG_GENERAL)
+        # This happens when --help is used, exit gracefully
+        sys.exit(0)
 
     if hasattr(args, "func"):
         # Check for updates only when help is not checked
@@ -127,6 +128,9 @@ def main():
         # Run subcommand
         try:
             args.func(args)
+        except ExpectedException as e:
+            print(e.message, file=sys.stderr)
+            sys.exit(e.error_code)
         except Exception as e:
             print(traceback.format_exc(), file=sys.stderr)
             print(f"Failed to run the program: {e}", file=sys.stderr)

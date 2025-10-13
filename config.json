@@ -28,7 +28,12 @@
                     "ext": "pdf",
                     "value": ""
                 }
-            ]
+            ],
+            "errors": {
+                "10": "Failed to parse arguments. Please check the usage and try again.",
+                "30": "Failed to find input file or download webpage from URL.",
+                "31": "Failed to convert HTML to PDF."
+            }
         },
         {
             "title": "Convert URL to PDF",
@@ -55,7 +60,12 @@
                     "ext": "pdf",
                     "value": ""
                 }
-            ]
+            ],
+            "errors": {
+                "10": "Failed to parse arguments. Please check the usage and try again.",
+                "30": "Failed to find input file or download webpage from URL.",
+                "31": "Failed to convert HTML to PDF."
+            }
         }
     ]
 }
