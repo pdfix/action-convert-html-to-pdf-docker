@@ -1,11 +1,12 @@
 import argparse
 import json
-import os
 import sys
 import threading
 import traceback
 from pathlib import Path
+from typing import Any
 
+from constants import CONFIG_FILE
 from exceptions import EC_ARG_GENERAL, MESSAGE_ARG_GENERAL, ExpectedException
 from html_to_pdf import convert_to_pdf
 from image_update import DockerImageContainerUpdateChecker
@@ -45,7 +46,7 @@ def get_pdfix_config(path: str) -> None:
     Args:
         path (string): Destination path for config.json file
     """
-    config_path = os.path.join(Path(__file__).parent.absolute(), "../config.json")
+    config_path: Path = Path(__file__).parent.parent.joinpath(CONFIG_FILE).resolve()
 
     with open(config_path, "r", encoding="utf-8") as file:
         if path is None:
@@ -66,9 +67,9 @@ def print_version() -> None:
     """
     Prints version found in config.json file.
     """
-    config_path = os.path.join(Path(__file__).parent.absolute(), "../config.json")
+    config_path: Path = Path(__file__).parent.parent.joinpath(CONFIG_FILE).resolve()
     with open(config_path, "r", encoding="utf-8") as file:
-        data = json.load(file)
+        data: Any = json.load(file)
         if "version" in data:
             # Skip "v:" from "version" data
             print(f"Version: {data['version'][2:]}")

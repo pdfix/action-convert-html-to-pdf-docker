@@ -4,6 +4,7 @@ import subprocess
 import sys
 import tempfile
 import uuid
+from pathlib import Path
 from typing import Optional
 
 import requests
@@ -11,15 +12,15 @@ import requests
 from exceptions import FailedToConvertException, FailedToDownloadException
 
 
-def setup_chrome_cli() -> str:
+def chrome_cli_relative_path() -> str:
     """
     Setups chrome for system.
 
     Returns:
         Path to proper executable for chrome.
     """
-    pltfm = platform.system()
-    arch = platform.processor()
+    pltfm: str = platform.system()
+    arch: str = platform.processor()
 
     if pltfm == "Darwin":
         if arch == "arm":
@@ -68,7 +69,7 @@ def try_download_url(url: str) -> tuple[Optional[bytes], Optional[Exception]]:
         Tuple of content as bytes or None, and exception if occurred.
     """
     try:
-        response = requests.get(url, stream=True)
+        response: requests.Response = requests.get(url, stream=True)
         response.raise_for_status()  # Raises HTTPError for 4xx or 5xx
     except requests.exceptions.HTTPError as e:
         return (None, e)
@@ -104,15 +105,13 @@ def convert_to_pdf(url: str, output: str) -> None:
         print(e, file=sys.stderr)
         raise FailedToDownloadException()
 
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-
     try:
-        chrome_cli: str = setup_chrome_cli()
+        path_to_chrome_cli: str = chrome_cli_relative_path()
     except Exception:
         print("Chrome cli was not found.", file=sys.stderr)
         raise FailedToConvertException()
 
-    chrome_cli = os.path.normpath(dir_path + "/" + chrome_cli)
+    chrome_cli: Path = Path(__file__).parent.joinpath(path_to_chrome_cli).resolve()
 
     with tempfile.TemporaryDirectory() as tempdir:
         file_path: str = os.path.join(tempdir, str(uuid.uuid4()) + ".html")
@@ -124,8 +123,8 @@ def convert_to_pdf(url: str, output: str) -> None:
 
         try:
             name: str = output
-            command = [
-                chrome_cli,
+            command: list[str] = [
+                chrome_cli.as_posix(),
                 "--headless",
                 f"--print-to-pdf={name}",
                 "--disable-gpu",
