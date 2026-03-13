@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Optional
 
 import requests
+from tqdm import tqdm
 
 from exceptions import FailedToConvertException, FailedToDownloadException
 
@@ -92,64 +93,70 @@ def convert_to_pdf(url: str, output: str) -> None:
         url (str): URL to website.
         output (str): Path to output PDF document.
     """
-    try:
-        if os.path.isfile(url):
-            print("Reading local file...")
-            with open(url, "rb") as file:
-                web_content: bytes = file.read()
-        else:
-            print("Webpage starting downloading...")
-            web_content = download_website(url)
-            print("Webpage downloaded")
-    except Exception as e:
-        print(e, file=sys.stderr)
-        raise FailedToDownloadException()
+    with tqdm(total=100) as progress_bar:
+        try:
+            if os.path.isfile(url):
+                progress_bar.set_description("Reading local file")
+                with open(url, "rb") as file:
+                    web_content: bytes = file.read()
+            else:
+                progress_bar.set_description("Downloading webpage")
+                web_content = download_website(url)
+        except Exception as e:
+            print(e, file=sys.stderr)
+            raise FailedToDownloadException()
 
-    try:
-        path_to_chrome_cli: str = chrome_cli_relative_path()
-    except Exception:
-        print("Chrome cli was not found.", file=sys.stderr)
-        raise FailedToConvertException()
-
-    chrome_cli: Path = Path(__file__).parent.joinpath(path_to_chrome_cli).resolve()
-
-    with tempfile.TemporaryDirectory() as tempdir:
-        file_path: str = os.path.join(tempdir, str(uuid.uuid4()) + ".html")
-
-        with open(file_path, "wb") as f:
-            f.write(web_content)
-
-        print("Webpage saved into container")
+        progress_bar.update(50)
+        progress_bar.set_description("Converting")
 
         try:
-            name: str = output
-            command: list[str] = [
-                chrome_cli.as_posix(),
-                "--headless",
-                f"--print-to-pdf={name}",
-                "--disable-gpu",
-                "--no-sandbox",
-                file_path,
-            ]
-            full_command: str = " ".join(command)
-            print(f"Executing chrome command: '{full_command}'")
-
-            result: subprocess.CompletedProcess[str] = subprocess.run(
-                command,
-                shell=False,
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-
-            print(f"Command ended with code {result.returncode}")
-
-            if result.returncode == 0:
-                print("Command executed successfully")
-            else:
-                raise Exception(f"Error: {result.stderr}")
+            path_to_chrome_cli: str = chrome_cli_relative_path()
         except Exception:
+            print("Chrome cli was not found.", file=sys.stderr)
             raise FailedToConvertException()
-        finally:
-            if os.path.exists(file_path):
-                os.remove(file_path)
+
+        chrome_cli: Path = Path(__file__).parent.joinpath(path_to_chrome_cli).resolve()
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            file_path: str = os.path.join(tempdir, str(uuid.uuid4()) + ".html")
+
+            with open(file_path, "wb") as f:
+                f.write(web_content)
+
+            print("Webpage saved into container")
+
+            try:
+                name: str = output
+                command: list[str] = [
+                    chrome_cli.as_posix(),
+                    "--headless",
+                    f"--print-to-pdf={name}",
+                    "--disable-gpu",
+                    "--no-sandbox",
+                    file_path,
+                ]
+                full_command: str = " ".join(command)
+                print(f"Executing chrome command: '{full_command}'")
+
+                result: subprocess.CompletedProcess[str] = subprocess.run(
+                    command,
+                    shell=False,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+
+                print(f"Command ended with code {result.returncode}")
+
+                if result.returncode == 0:
+                    print("Command executed successfully")
+                else:
+                    raise Exception(f"Error: {result.stderr}")
+            except Exception:
+                raise FailedToConvertException()
+            finally:
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+
+        progress_bar.set_description("Done")
+        progress_bar.update(50)
