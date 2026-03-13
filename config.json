@@ -33,7 +33,8 @@
                 "10": "Failed to parse arguments. Please check the usage and try again.",
                 "30": "Failed to find input file or download webpage from URL.",
                 "31": "Failed to convert HTML to PDF."
-            }
+            },
+            "progress_regex": "^[^:]+:\\s+(?<progress>\\d{1,3})%"
         },
         {
             "title": "Convert URL to PDF",
@@ -65,7 +66,8 @@
                 "10": "Failed to parse arguments. Please check the usage and try again.",
                 "30": "Failed to find input file or download webpage from URL.",
                 "31": "Failed to convert HTML to PDF."
-            }
+            },
+            "progress_regex": "^[^:]+:\\s+(?<progress>\\d{1,3})%"
         }
     ]
 }
