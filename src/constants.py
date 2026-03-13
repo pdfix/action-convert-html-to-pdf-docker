@@ -1,4 +1,4 @@
-CONFIG_FILE = "config.json"
-DOCKER_NAMESPACE = "pdfix"
-DOCKER_REPOSITORY = "convert-html-to-pdf"
-DOCKER_IMAGE = f"{DOCKER_NAMESPACE}/{DOCKER_REPOSITORY}"
+CONFIG_FILE: str = "config.json"
+DOCKER_NAMESPACE: str = "pdfix"
+DOCKER_REPOSITORY: str = "convert-html-to-pdf"
+DOCKER_IMAGE: str = f"{DOCKER_NAMESPACE}/{DOCKER_REPOSITORY}"
