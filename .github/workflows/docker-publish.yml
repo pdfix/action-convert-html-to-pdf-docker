@@ -81,7 +81,7 @@ jobs:
 
       - name: Clone versions repository
         run: |
-          git clone https://x-access-token:${{ secrets.PAT_VERSIONS }}@github.com/pdfix/pdfix-version-updates.git pdfix-version-updates
+          git clone https://oauth2:${{ secrets.PAT_VERSIONS }}@github.com/pdfix/pdfix-version-updates.git pdfix-version-updates
 
       - name: Update versions repository with new version
         run: chmod +x update_versions_repository.sh && ./update_versions_repository.sh ${{ env.DOCKER_HUB_NAMESPACE }} ${{ env.DOCKER_HUB_REPOSITORY }} ${{ env.tag }}
