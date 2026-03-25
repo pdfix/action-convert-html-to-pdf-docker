@@ -73,15 +73,22 @@ def try_download_url(url: str) -> tuple[Optional[bytes], Optional[Exception]]:
         response: requests.Response = requests.get(url, stream=True)
         response.raise_for_status()  # Raises HTTPError for 4xx or 5xx
     except requests.exceptions.HTTPError as e:
+        print(f"For '{url}' I got HTTPError")
         return (None, e)
     except requests.exceptions.ConnectionError as e:
+        # DNS failure -> webpage does not exists
+        print(f"For '{url}' I got ConnectionError")
         return (None, e)
     except requests.exceptions.Timeout as e:
+        print(f"For '{url}' I got Timeout")
         return (None, e)
     except requests.exceptions.RequestException as e:
+        print(f"For '{url}' I got RequestException")
         return (None, e)
     if isinstance(response.content, bytes):
+        print(f"For '{url}' I got bytes")
         return (response.content, None)
+    print(f"For '{url}' I did not get bytes or exception")
     return (None, None)
 
 
