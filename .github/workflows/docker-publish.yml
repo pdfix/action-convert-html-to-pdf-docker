@@ -82,12 +82,19 @@ jobs:
       - name: Prepare directory for versions repository
         run: mkdir -p pdfix-version-updates
 
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Checkout versions repo
         uses: actions/checkout@v4
         with:
           repository: pdfix/pdfix-version-updates
           path: pdfix-version-updates
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
           ref: main
 
       - name: Update versions repository with new version
