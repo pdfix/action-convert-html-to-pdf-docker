@@ -89,6 +89,13 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: pdfix
+          repositories: pdfix-version-updates
+
+      - name: Debug token access
+        run: |
+          curl -H "Authorization: Bearer ${{ steps.app-token.outputs.token }}" \
+              https://api.github.com/repos/pdfix/pdfix-version-updates
 
       - name: Checkout versions repo
         uses: actions/checkout@v4
