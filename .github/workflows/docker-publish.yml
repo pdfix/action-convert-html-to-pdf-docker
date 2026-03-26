@@ -92,11 +92,6 @@ jobs:
           owner: pdfix
           repositories: pdfix-version-updates
 
-      - name: Debug token access
-        run: |
-          curl -H "Authorization: Bearer ${{ steps.app-token.outputs.token }}" \
-              https://api.github.com/repos/pdfix/pdfix-version-updates
-
       - name: Checkout versions repo
         uses: actions/checkout@v4
         with:
@@ -104,6 +99,8 @@ jobs:
           path: pdfix-version-updates
           token: ${{ steps.app-token.outputs.token }}
           ref: main
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Update versions repository with new version
         run: chmod +x update_versions_repository.sh && ./update_versions_repository.sh ${{ env.DOCKER_HUB_NAMESPACE }} ${{ env.DOCKER_HUB_REPOSITORY }} ${{ env.tag }}
