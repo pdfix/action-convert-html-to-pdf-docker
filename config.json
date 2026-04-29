@@ -38,7 +38,7 @@
                 "30": "Failed to find input file or download webpage from URL.",
                 "31": "Failed to convert HTML to PDF."
             },
-            "progress_regex": "^[^:]+:\\s+(?<progress>\\d{1,3})%"
+            "progress_regex": "^(?<text>[^:]+):\\s+(?<progress>\\d{1,3})%"
         },
         {
             "title": "Convert URL to PDF",
@@ -75,7 +75,7 @@
                 "30": "Failed to find input file or download webpage from URL.",
                 "31": "Failed to convert HTML to PDF."
             },
-            "progress_regex": "^[^:]+:\\s+(?<progress>\\d{1,3})%"
+            "progress_regex": "^(?<text>[^:]+):\\s+(?<progress>\\d{1,3})%"
         }
     ]
 }
