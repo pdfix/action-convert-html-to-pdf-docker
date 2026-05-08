@@ -1,55 +1,68 @@
 # HTML to PDF
 
-A Docker image action that converts HTML pages to PDF files using PDFix SDK and Google Headless Chrome.
+A Docker image that converts HTML pages to PDF files using headless Chrome.
 
 ## Table of Contents
 
 - [HTML to PDF](#html-to-pdf)
-  - [Table of Contents](#table-of-contents)
-  - [Getting Started](#getting-started)
-  - [Run using Command Line Interface](#run-using-command-line-interface)
-  - [Exporting Configuration for Integration](#exporting-configuration-for-integration)
-  - [Available Chrome Versions](#available-chrome-versions)
-  - [License \& libraries used](#license--libraries-used)
-  - [Help \& Support](#help--support)
+  - [Getting started](#getting-started)
+  - [Usage](#usage)
+  - [Commands](#commands)
+  - [Arguments](#arguments)
+  - [Examples](#examples)
+  - [Notes](#notes)
+  - [Help \& support](#help--support)
+  - [Licenses](#licenses)
 
-## Getting Started
+## Getting started
 
-To use this Docker application, you'll need to have Docker installed on your system. If Docker is not installed, please follow the instructions on the [official Docker website](https://docs.docker.com/get-docker/) to install it.
+You need Docker installed. The first run downloads the image and may take longer than later runs.
 
-## Run using Command Line Interface
+## Usage
 
-To run docker container as CLI you should share the folder with html file to process using `-v` parameter. In this example it's current folder. The url can be local html file or URL address.
-
-```bash
-docker run -v $(pwd):/data/ -w /data/ pdfix/html-to-pdf:latest html-to-pdf -i index.html -o convert.pdf
-```
-
-First run will pull the docker image, which may take some time. Make your own image for more advanced use.
-
-For more detailed information about the available command-line arguments, you can run the following command:
+Mount a folder into the container and run a subcommand:
 
 ```bash
-docker run --rm pdfix/html-to-pdf:latest --help
+docker run --rm -v "$(pwd)":/data -w /data pdfix/html-to-pdf:latest <command> [options]
 ```
 
-## Exporting Configuration for Integration
+## Commands
 
-To export the configuration JSON file, use the following command:
+- `html-to-pdf`: Convert HTML (local file or URL) to PDF
+
+## Arguments
+
+### `html-to-pdf`
+
+| Option | Required | Type / expected value | Description |
+|---|:---:|---|---|
+| `--input`, `-i` | yes | URL (`https://…`) or path to an existing HTML file under the mounted volume | Page to convert |
+| `--output`, `-o` | yes | Path for the output `.pdf` file | Output PDF |
+| `--version`, `-v` | no | Flag (no value); prints version and exits | Print version |
+
+## Examples
+
+Convert a local HTML file:
 
 ```bash
-docker run -v $(pwd):/data -w /data --rm pdfix/html-to-pdf:latest config -o config.json
+docker run --rm -v "$(pwd)":/data -w /data pdfix/html-to-pdf:latest html-to-pdf -i /data/index.html -o /data/convert.pdf
 ```
 
-## Available Chrome Versions
+Convert a URL:
 
-[Chrome for Testing availability](https://googlechromelabs.github.io/chrome-for-testing/)
+```bash
+docker run --rm -v "$(pwd)":/data -w /data pdfix/html-to-pdf:latest html-to-pdf -i "https://example.com" -o /data/convert.pdf
+```
 
-## License & libraries used
+## Notes
 
-- Chromium - https://www.chromium.org/Home/
+- Chrome builds follow “Chrome for Testing”.
 
-## Help & Support
+## Help & support
 
-To obtain a PDFix SDK license or report an issue please contact us at support@pdfix.net.
-For more information visit https://pdfix.net
+To report an issue, contact `support@pdfix.net`.
+
+## Licenses
+
+- [Chromium](https://www.chromium.org/Home/)
+- [Chrome for Testing](https://googlechromelabs.github.io/chrome-for-testing/)
