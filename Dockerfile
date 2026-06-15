@@ -1,15 +1,13 @@
 # Use the official Debian slim image as a base
 FROM debian:stable-slim
 
-# Update system and Install python3 and necessary dependencies
+# Update system and install Python, Chromium, and fonts
 RUN apt-get update && \
     apt-get install -y \
     python3 \
     python3-pip \
     python3-venv \
-    wget \
-    unzip \
-    libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2 \
+    chromium \
     fontconfig \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -23,11 +21,6 @@ RUN python3 -m venv venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 COPY requirements.txt /usr/html-to-pdf/
 RUN pip install --no-cache-dir -r requirements.txt
-
-
-# Download chrome
-COPY download_chrome.sh /usr/html-to-pdf/
-RUN chmod +x download_chrome.sh && ./download_chrome.sh
 
 
 # Copy the source code

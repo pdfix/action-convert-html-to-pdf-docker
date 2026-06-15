@@ -1,6 +1,6 @@
 # HTML to PDF
 
-A Docker image that converts HTML pages to PDF files using headless Chrome.
+A Docker image that converts HTML pages to PDF files using headless Chromium.
 
 ## Table of Contents
 
@@ -56,7 +56,7 @@ docker run --rm -v "$(pwd)":/data -w /data pdfix/html-to-pdf:latest html-to-pdf 
 
 ## Notes
 
-- Chrome builds follow “Chrome for Testing”.
+- The Docker image uses the open-source [Chromium](https://www.chromium.org/Home/) package from Debian stable.
 
 ## Help & support
 
@@ -64,5 +64,4 @@ To report an issue, contact `support@pdfix.net`.
 
 ## Licenses
 
-- [Chromium](https://www.chromium.org/Home/)
-- [Chrome for Testing](https://googlechromelabs.github.io/chrome-for-testing/)
+- [Chromium](https://www.chromium.org/Home/) (BSD-style license)
