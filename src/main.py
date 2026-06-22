@@ -13,14 +13,17 @@ from image_update import DockerImageContainerUpdateChecker
 
 
 def set_arguments(
-    parser: argparse.ArgumentParser, names: list, required_output: bool = True, output_help: str = ""
+    parser: argparse.ArgumentParser,
+    names: list[str],
+    required_output: bool = True,
+    output_help: str = "",
 ) -> None:
     """
     Set arguments for the parser based on the provided names and options.
 
     Args:
         parser (argparse.ArgumentParser): The argument parser to set arguments for.
-        names (list): List of argument names to set.
+        names (list[str]): List of argument names to set.
         required_output (bool): Whether the output argument is required. Defaults to True.
         output_help (str): Help shown for output argument. Defaults to "".
     """
@@ -86,7 +89,8 @@ def html_to_pdf(url: str, output_path: str) -> None:
     convert_to_pdf(url, output_path)
 
 
-def main():
+def main() -> None:
+    """Parse CLI arguments and run the selected subcommand."""
     parser = argparse.ArgumentParser()
 
     subparsers = parser.add_subparsers(dest="subparser")

@@ -17,8 +17,8 @@ def get_links(url: str) -> set[str]:
     """
     links: set[str] = set()
     try:
-        response = requests.get(url, timeout=30)
-        soup = BeautifulSoup(response.content, "html.parser")
+        response: requests.Response = requests.get(url, timeout=30)
+        soup: BeautifulSoup = BeautifulSoup(response.content, "html.parser")
         for a_tag in soup.find_all("a", href=True):
             link: str = a_tag["href"]
 
@@ -48,7 +48,7 @@ def crawl_website(start_url: str, max_pages: int) -> set[str]:
     pages_to_crawl: set[str] = {start_url}
 
     while pages_to_crawl and len(crawled_pages) < max_pages:
-        url = pages_to_crawl.pop()
+        url: str = pages_to_crawl.pop()
         if url not in crawled_pages:
             print(f"Crawling: {url}")
             crawled_pages.add(url)

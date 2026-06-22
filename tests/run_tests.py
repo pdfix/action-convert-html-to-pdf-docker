@@ -4,11 +4,11 @@ import random
 import string
 import subprocess
 import sys
-from multiprocessing.pool import ThreadPool
+from multiprocessing.pool import ApplyResult, ThreadPool
 
 from tqdm import tqdm
 
-CHROME_VERSION = "122.0.6261.111"
+CHROME_VERSION: str = "122.0.6261.111"
 
 
 def run_chrome(url: str) -> bool:
@@ -21,12 +21,14 @@ def run_chrome(url: str) -> bool:
     Returns:
         True if converted, False otherwise.
     """
-    chrome = "../dist/html_to_pdf/html_to_pdf"
-    random_name = "".join(random.choices(string.ascii_lowercase + string.digits, k=10)) + ".pdf"
-    args = [chrome, "--url", url, "--output", random_name]
+    chrome: str = "../dist/html_to_pdf/html_to_pdf"
+    random_name: str = "".join(random.choices(string.ascii_lowercase + string.digits, k=10)) + ".pdf"
+    args: list[str] = [chrome, "--url", url, "--output", random_name]
     log_to_file(f"Running with args: {' '.join(args)}")
 
-    result = subprocess.run(args, shell=False, capture_output=True, text=True, check=False)
+    result: subprocess.CompletedProcess[str] = subprocess.run(
+        args, shell=False, capture_output=True, text=True, check=False
+    )
 
     if result.returncode == 0:
         print("Command executed successfully")
@@ -66,16 +68,16 @@ def test_urls_from_file_with_chrome(file_path: str) -> None:
 
     try:
         with open(file_path, "r") as file:
-            pool = ThreadPool(processes=1)
+            pool: ThreadPool = ThreadPool(processes=1)
 
             with tqdm(total=total, desc="Running tests", unit="test") as pbar:
                 for line in file:
-                    url = line.strip()
+                    url: str = line.strip()
 
-                    async_result = pool.apply_async(run_chrome, (url,))
+                    async_result: ApplyResult[bool] = pool.apply_async(run_chrome, (url,))
 
                     try:
-                        res = async_result.get(timeout=30)
+                        res: bool = async_result.get(timeout=30)
                         if res:
                             ok += 1
                     except multiprocessing.context.TimeoutError:
@@ -97,10 +99,10 @@ def log_to_file(message: str) -> None:
         message (str): Message to log.
     """
     with open("test.log", "a") as log_file:
-        now = datetime.datetime.now()
+        now: datetime.datetime = datetime.datetime.now()
         log_file.write(f"[{now.time()}] {message}\n")
 
 
 if __name__ == "__main__":
-    file_path = "collected_links.txt"
+    file_path: str = "collected_links.txt"
     test_urls_from_file_with_chrome(file_path)
