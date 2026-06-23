@@ -60,9 +60,7 @@ class CdpSession:
             except WebSocketTimeoutException:
                 continue
 
-            raw: str = (
-                raw_message.decode("utf-8") if isinstance(raw_message, bytes) else raw_message
-            )
+            raw: str = raw_message.decode("utf-8") if isinstance(raw_message, bytes) else raw_message
             response: dict[str, Any] = json.loads(raw)
             if response.get("id") != message_id:
                 continue
