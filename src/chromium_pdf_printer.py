@@ -347,7 +347,7 @@ class ChromiumPdfPrinter:
                     else:
                         progress_bar.set_description(self.chunk_progress_message(chunk_info))
                         progress_bar.update(progress_bar_step)
-                        self._logger.info(self.chunk_progress_message(chunk_info))
+                        self._logger.debug(self.chunk_progress_message(chunk_info))
                         part_path: Path = part_dir.joinpath(
                             f"part-{part_index_offset + 1:04d}.pdf",
                         )
@@ -357,9 +357,9 @@ class ChromiumPdfPrinter:
                     part_paths.extend(chunk_parts)
                     part_index_offset += len(chunk_parts)
 
-                self._logger.info("Merging %s PDF part(s)", len(part_paths))
+                self._logger.debug("Merging %s PDF part(s)", len(part_paths))
                 self.merge_pdf_parts(part_paths, output_path)
-                self._logger.info("PDF parts merged successfully")
+                self._logger.debug("PDF parts merged successfully")
             finally:
                 session.close()
         finally:

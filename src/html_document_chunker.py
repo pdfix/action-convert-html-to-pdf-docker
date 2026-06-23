@@ -144,7 +144,7 @@ class HtmlDocumentChunker:
         """
         section_count: int = self.count_page_sections(html_path)
         if section_count == 0:
-            self._logger.info("Continuous HTML; will print with page-range batching")
+            self._logger.debug("Continuous HTML; will print with page-range batching")
             return [
                 HtmlChunkInfo(
                     path=html_path,
@@ -157,7 +157,7 @@ class HtmlDocumentChunker:
             ]
 
         if section_count <= self._chunk_size:
-            self._logger.info(
+            self._logger.debug(
                 "Found %s HTML page section(s); fits in one chunk (max %s)",
                 section_count,
                 self._chunk_size,
@@ -174,7 +174,7 @@ class HtmlDocumentChunker:
             ]
 
         total_chunks: int = (section_count + self._chunk_size - 1) // self._chunk_size
-        self._logger.info(
+        self._logger.debug(
             "Found %s HTML page section(s); splitting into %s file chunk(s) of up to %s pages",
             section_count,
             total_chunks,

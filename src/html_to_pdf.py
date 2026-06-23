@@ -125,13 +125,13 @@ def convert_to_pdf(url: str, output: str) -> None:
             raise FailedToConvertException()
 
         if tempdir is None:
-            logger.info("Using local HTML file")
+            logger.debug("Using local HTML file")
         else:
-            logger.info("Webpage saved into container")
+            logger.debug("Webpage saved into container")
 
         try:
             printer.print_html_to_pdf(html_path, output_path, progress_bar)
-            logger.info("Command executed successfully")
+            logger.debug("Command executed successfully")
         except ExpectedException:
             raise
         except Exception as e:
