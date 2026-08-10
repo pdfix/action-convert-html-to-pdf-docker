@@ -65,3 +65,4 @@ To report an issue, contact `support@pdfix.net`.
 ## Licenses
 
 - [Chromium](https://www.chromium.org/Home/) (BSD-style license)
+

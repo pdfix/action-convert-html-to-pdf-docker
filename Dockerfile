@@ -14,7 +14,6 @@ RUN apt-get update && \
 
 WORKDIR /usr/html-to-pdf/
 
-
 # Create a virtual environment and install dependencies
 ENV VIRTUAL_ENV=venv
 RUN python3 -m venv venv
@@ -22,10 +21,11 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 COPY requirements.txt /usr/html-to-pdf/
 RUN pip install --no-cache-dir -r requirements.txt
 
-
 # Copy the source code
 COPY config.json /usr/html-to-pdf/
 COPY src/ /usr/html-to-pdf/src/
 
+# License
+LABEL license="Chromium (BSD-style license)"
 
 ENTRYPOINT ["/usr/html-to-pdf/venv/bin/python3", "/usr/html-to-pdf/src/main.py"]
