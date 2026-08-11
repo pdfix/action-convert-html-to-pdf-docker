@@ -3,4 +3,4 @@ tqdm==4.67.1
 types-requests==2.33.0.20260408
 urllib3==2.7.0
 websocket-client==1.8.0
-pypdf==6.14.2
+pypdf==6.15.0
