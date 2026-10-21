@@ -38,7 +38,7 @@ def download_website_to_file(url: str, destination: Path) -> None:
             first_exception = exception
 
     if first_exception is not None:
-        logger.error("%s", first_exception)
+        logger.error(f"{first_exception}")
 
     raise FailedToDownloadException()
 
@@ -62,19 +62,19 @@ def try_download_url_to_file(url: str, destination: Path) -> Optional[Exception]
                     if chunk:
                         file.write(chunk)
     except requests.exceptions.HTTPError as e:
-        logger.warning("For '%s' I got HTTPError", url)
+        logger.warning(f"For '{url}' I got HTTPError")
         return e
     except requests.exceptions.ConnectionError as e:
-        logger.warning("For '%s' I got ConnectionError", url)
+        logger.warning(f"For '{url}' I got ConnectionError")
         return e
     except requests.exceptions.Timeout as e:
-        logger.warning("For '%s' I got Timeout", url)
+        logger.warning(f"For '{url}' I got Timeout")
         return e
     except requests.exceptions.RequestException as e:
-        logger.warning("For '%s' I got RequestException", url)
+        logger.warning(f"For '{url}' I got RequestException")
         return e
 
-    logger.info("For '%s' download completed", url)
+    logger.info(f"For '{url}' download completed")
     return None
 
 
@@ -110,7 +110,7 @@ def convert_to_pdf(url: str, output: str) -> None:
         except ExpectedException:
             raise
         except Exception as e:
-            logger.error("%s", e)
+            logger.error(f"{e}")
             raise FailedToDownloadException()
 
         if html_path is None:
@@ -135,7 +135,7 @@ def convert_to_pdf(url: str, output: str) -> None:
         except ExpectedException:
             raise
         except Exception as e:
-            logger.error("%s", e)
+            logger.error(f"{e}")
             raise FailedToConvertException()
         finally:
             if tempdir is not None:

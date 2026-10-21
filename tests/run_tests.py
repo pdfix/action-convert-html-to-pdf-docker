@@ -22,7 +22,7 @@ def run_chrome(url: str) -> bool:
         True if converted, False otherwise.
     """
     chrome: str = "../dist/html_to_pdf/html_to_pdf"
-    random_name: str = "".join(random.choices(string.ascii_lowercase + string.digits, k=10)) + ".pdf"
+    random_name: str = f"{''.join(random.choices(string.ascii_lowercase + string.digits, k=10))}.pdf"
     args: list[str] = [chrome, "--url", url, "--output", random_name]
     log_to_file(f"Running with args: {' '.join(args)}")
 

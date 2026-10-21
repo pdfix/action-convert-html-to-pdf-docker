@@ -357,7 +357,7 @@ class ChromiumPdfPrinter:
                     part_paths.extend(chunk_parts)
                     part_index_offset += len(chunk_parts)
 
-                self._logger.debug("Merging %s PDF part(s)", len(part_paths))
+                self._logger.debug(f"Merging {len(part_paths)} PDF part(s)")
                 self.merge_pdf_parts(part_paths, output_path)
                 self._logger.debug("PDF parts merged successfully")
             finally:

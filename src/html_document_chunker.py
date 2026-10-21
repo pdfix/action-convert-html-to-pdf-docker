@@ -158,9 +158,7 @@ class HtmlDocumentChunker:
 
         if section_count <= self._chunk_size:
             self._logger.debug(
-                "Found %s HTML page section(s); fits in one chunk (max %s)",
-                section_count,
-                self._chunk_size,
+                f"Found {section_count} HTML page section(s); fits in one chunk (max {self._chunk_size})"
             )
             return [
                 HtmlChunkInfo(
@@ -175,10 +173,8 @@ class HtmlDocumentChunker:
 
         total_chunks: int = (section_count + self._chunk_size - 1) // self._chunk_size
         self._logger.debug(
-            "Found %s HTML page section(s); splitting into %s file chunk(s) of up to %s pages",
-            section_count,
-            total_chunks,
-            self._chunk_size,
+            f"Found {section_count} HTML page section(s); splitting into {total_chunks} file chunk(s) "
+            f"of up to {self._chunk_size} pages"
         )
 
         prefix_lines: list[str] = []
@@ -206,11 +202,8 @@ class HtmlDocumentChunker:
                 )
             )
             self._logger.debug(
-                "Wrote file chunk %s/%s (pages %s-%s)",
-                chunk_index,
-                total_chunks,
-                page_numbers_in_chunk[0],
-                page_numbers_in_chunk[-1],
+                f"Wrote file chunk {chunk_index}/{total_chunks} "
+                f"(pages {page_numbers_in_chunk[0]}-{page_numbers_in_chunk[-1]})"
             )
             pages_in_chunk = []
             page_numbers_in_chunk = []

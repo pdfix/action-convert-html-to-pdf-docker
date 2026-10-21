@@ -66,4 +66,4 @@ if __name__ == "__main__":
 
     with open("collected_links.txt", "w") as file:
         for page in crawled_pages:
-            file.write(page + "\n")
+            file.write(f"{page}\n")
