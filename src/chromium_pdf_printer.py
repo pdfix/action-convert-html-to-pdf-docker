@@ -10,8 +10,9 @@ from typing import Any
 
 import requests
 import tqdm
-from pypdf import PdfWriter
 
+# Disabled together with chunked printing, so the Docker image does not need pypdf.
+# from pypdf import PdfWriter
 from cdp_session import CdpSession
 from constants import (
     CDP_IO_READ_SIZE,
@@ -19,35 +20,40 @@ from constants import (
     CHROMIUM_EXECUTABLE,
     CHROMIUM_PAGE_READY_TIMEOUT,
     CHROMIUM_PRINT_TIMEOUT,
-    PAGE_RANGE_EXCEEDED_MESSAGE,
-    PDF_PAGE_CHUNK_SIZE,
+    # PAGE_RANGE_EXCEEDED_MESSAGE,
+    # PDF_PAGE_CHUNK_SIZE,
 )
-from html_chunk_info import HtmlChunkInfo
-from html_document_chunker import HtmlDocumentChunker
+
+# from html_chunk_info import HtmlChunkInfo
+# from html_document_chunker import HtmlDocumentChunker
 from logger import get_logger
 
 
 class ChromiumPdfPrinter:
     """
-    Renders an HTML document or webpage to PDF using headless Chromium.
+    Renders an HTML document or webpage to a tagged PDF using headless Chromium.
 
-    Large multi-section HTML is split into file chunks first. Continuous HTML
-    uses CDP page-range batching on a single loaded document.
+    The whole document is printed in one pass, so the PDF keeps the tag tree generated
+    by Chromium.
     """
 
-    def __init__(
-        self,
-        page_chunk_size: int = PDF_PAGE_CHUNK_SIZE,
-        chunker: HtmlDocumentChunker | None = None,
-    ) -> None:
-        """
-        Args:
-            page_chunk_size (int): Maximum PDF pages printed per batch or file chunk.
-            chunker (HtmlDocumentChunker | None): HTML splitter for multi-section documents.
-        """
-        self._page_chunk_size: int = page_chunk_size
-        self._chunker: HtmlDocumentChunker = chunker or HtmlDocumentChunker(page_chunk_size)
+    def __init__(self) -> None:
+        """Creates the printer logger."""
         self._logger: logging.Logger = get_logger(__name__)
+
+    # Disabled: chunked printing drops the PDF tag tree. See the note in print_html_to_pdf.
+    # def __init__(
+    #     self,
+    #     page_chunk_size: int = PDF_PAGE_CHUNK_SIZE,
+    #     chunker: HtmlDocumentChunker | None = None,
+    # ) -> None:
+    #     """
+    #     Args:
+    #         page_chunk_size (int): Maximum PDF pages printed per batch or file chunk.
+    #         chunker (HtmlDocumentChunker | None): HTML splitter for multi-section documents.
+    #     """
+    #     self._page_chunk_size: int = page_chunk_size
+    #     self._chunker: HtmlDocumentChunker = chunker or HtmlDocumentChunker(page_chunk_size)
 
     @staticmethod
     def pick_free_port() -> int:
@@ -176,6 +182,7 @@ class ChromiumPdfPrinter:
         params: dict[str, Any] = {
             "printBackground": True,
             "preferCSSPageSize": True,
+            "generateTaggedPDF": True,
             "transferMode": "ReturnAsStream",
         }
         if page_ranges is not None:
@@ -188,101 +195,102 @@ class ChromiumPdfPrinter:
         )
         ChromiumPdfPrinter.write_pdf_stream(session, result["stream"], destination)
 
-    @staticmethod
-    def merge_pdf_parts(part_paths: list[Path], output_path: Path) -> None:
-        """
-        Merge multiple PDF files into a single output document.
-
-        Args:
-            part_paths (list[Path]): Paths to PDF parts in merge order.
-            output_path (Path): Path to write the merged PDF.
-        """
-        writer: PdfWriter = PdfWriter()
-        for part_path in part_paths:
-            writer.append(part_path)
-        with open(output_path, "wb") as output_file:
-            writer.write(output_file)
-
-    @staticmethod
-    def is_page_range_exceeded(error: BaseException) -> bool:
-        """
-        Return whether a CDP error means the requested page range is past the document end.
-
-        Args:
-            error (BaseException): Exception raised by :class:`CdpSession`.
-
-        Returns:
-            bool: ``True`` when no further batches should be printed.
-        """
-        if not isinstance(error, RuntimeError) or not error.args:
-            return False
-        cdp_error: Any = error.args[0]
-        if not isinstance(cdp_error, dict):
-            return False
-        return cdp_error.get("message") == PAGE_RANGE_EXCEEDED_MESSAGE
-
-    @staticmethod
-    def chunk_progress_message(chunk_info: HtmlChunkInfo) -> str:
-        """
-        Build the progress log line for one file chunk print step.
-
-        Args:
-            chunk_info (HtmlChunkInfo): Chunk being printed.
-
-        Returns:
-            str: Message for progress logging.
-        """
-        if chunk_info.first_page > 0:
-            return (
-                f"Printing chunk {chunk_info.index}/{chunk_info.total} "
-                f"(pages {chunk_info.first_page}-{chunk_info.last_page})"
-            )
-        return f"Printing chunk {chunk_info.index}/{chunk_info.total}"
-
-    def print_page_range_batches(
-        self,
-        session: CdpSession,
-        part_dir: Path,
-        part_index_offset: int = 0,
-    ) -> list[Path]:
-        """
-        Print the loaded document in PDF page-range batches.
-
-        Used for continuous HTML/webpages where the full document stays in one tab.
-
-        Args:
-            session (CdpSession): Active CDP session with the document loaded.
-            part_dir (Path): Directory for temporary PDF part files.
-            part_index_offset (int): Starting index for part file names.
-
-        Returns:
-            list[Path]: Paths to PDF parts in print order.
-
-        Raises:
-            RuntimeError: If the first batch cannot be printed.
-        """
-        part_paths: list[Path] = []
-        start_page: int = 1
-        batch_index: int = 0
-
-        while True:
-            end_page: int = start_page + self._page_chunk_size - 1
-            page_ranges: str = f"{start_page}-{end_page}"
-            batch_index += 1
-            part_path: Path = part_dir.joinpath(f"part-{part_index_offset + batch_index:04d}.pdf")
-
-            try:
-                self.print_to_pdf(session, part_path, page_ranges)
-            except RuntimeError as error:
-                if part_paths and self.is_page_range_exceeded(error):
-                    break
-                raise
-
-            part_paths.append(part_path)
-            start_page = end_page + 1
-
-        return part_paths
-
+    # Disabled: chunked printing drops the PDF tag tree. See the note in print_html_to_pdf.
+    # @staticmethod
+    # def merge_pdf_parts(part_paths: list[Path], output_path: Path) -> None:
+    #     """
+    #     Merge multiple PDF files into a single output document.
+    #
+    #     Args:
+    #         part_paths (list[Path]): Paths to PDF parts in merge order.
+    #         output_path (Path): Path to write the merged PDF.
+    #     """
+    #     writer: PdfWriter = PdfWriter()
+    #     for part_path in part_paths:
+    #         writer.append(part_path)
+    #     with open(output_path, "wb") as output_file:
+    #         writer.write(output_file)
+    #
+    # @staticmethod
+    # def is_page_range_exceeded(error: BaseException) -> bool:
+    #     """
+    #     Return whether a CDP error means the requested page range is past the document end.
+    #
+    #     Args:
+    #         error (BaseException): Exception raised by :class:`CdpSession`.
+    #
+    #     Returns:
+    #         bool: ``True`` when no further batches should be printed.
+    #     """
+    #     if not isinstance(error, RuntimeError) or not error.args:
+    #         return False
+    #     cdp_error: Any = error.args[0]
+    #     if not isinstance(cdp_error, dict):
+    #         return False
+    #     return cdp_error.get("message") == PAGE_RANGE_EXCEEDED_MESSAGE
+    #
+    # @staticmethod
+    # def chunk_progress_message(chunk_info: HtmlChunkInfo) -> str:
+    #     """
+    #     Build the progress log line for one file chunk print step.
+    #
+    #     Args:
+    #         chunk_info (HtmlChunkInfo): Chunk being printed.
+    #
+    #     Returns:
+    #         str: Message for progress logging.
+    #     """
+    #     if chunk_info.first_page > 0:
+    #         return (
+    #             f"Printing chunk {chunk_info.index}/{chunk_info.total} "
+    #             f"(pages {chunk_info.first_page}-{chunk_info.last_page})"
+    #         )
+    #     return f"Printing chunk {chunk_info.index}/{chunk_info.total}"
+    #
+    # def print_page_range_batches(
+    #     self,
+    #     session: CdpSession,
+    #     part_dir: Path,
+    #     part_index_offset: int = 0,
+    # ) -> list[Path]:
+    #     """
+    #     Print the loaded document in PDF page-range batches.
+    #
+    #     Used for continuous HTML/webpages where the full document stays in one tab.
+    #
+    #     Args:
+    #         session (CdpSession): Active CDP session with the document loaded.
+    #         part_dir (Path): Directory for temporary PDF part files.
+    #         part_index_offset (int): Starting index for part file names.
+    #
+    #     Returns:
+    #         list[Path]: Paths to PDF parts in print order.
+    #
+    #     Raises:
+    #         RuntimeError: If the first batch cannot be printed.
+    #     """
+    #     part_paths: list[Path] = []
+    #     start_page: int = 1
+    #     batch_index: int = 0
+    #
+    #     while True:
+    #         end_page: int = start_page + self._page_chunk_size - 1
+    #         page_ranges: str = f"{start_page}-{end_page}"
+    #         batch_index += 1
+    #         part_path: Path = part_dir.joinpath(f"part-{part_index_offset + batch_index:04d}.pdf")
+    #
+    #         try:
+    #             self.print_to_pdf(session, part_path, page_ranges)
+    #         except RuntimeError as error:
+    #             if part_paths and self.is_page_range_exceeded(error):
+    #                 break
+    #             raise
+    #
+    #         part_paths.append(part_path)
+    #         start_page = end_page + 1
+    #
+    #     return part_paths
+    #
     def print_html_to_pdf(
         self,
         html_path: Path,
@@ -297,10 +305,13 @@ class ChromiumPdfPrinter:
             output_path (Path): Path to write the final PDF.
             progress_bar (tqdm.tqdm): Progress bar to update.
         """
-        chunk_dir: Path = Path(tempfile.mkdtemp(prefix="html-chunks-"))
-        part_dir: Path = Path(tempfile.mkdtemp(prefix="pdf-parts-"))
+        # Disabled: printing in chunks kept memory low for very large HTML (PVQ-5529), but pypdf
+        # drops the tag tree when it merges the parts. The chunking and merging code stays
+        # commented out here for a future merge that can keep the tag tree.
+        # chunk_dir: Path = Path(tempfile.mkdtemp(prefix="html-chunks-"))
+        # part_dir: Path = Path(tempfile.mkdtemp(prefix="pdf-parts-"))
         resolved_html_path: Path = html_path.resolve()
-        chunk_infos: list[HtmlChunkInfo] = self._chunker.split(resolved_html_path, chunk_dir)
+        # chunk_infos: list[HtmlChunkInfo] = self._chunker.split(resolved_html_path, chunk_dir)
 
         port: int = self.pick_free_port()
         user_data_dir: Path = Path(tempfile.mkdtemp(prefix="chromium-profile-"))
@@ -321,45 +332,52 @@ class ChromiumPdfPrinter:
             text=True,
         )
 
-        part_paths: list[Path] = []
-        created_chunk_paths: set[Path] = {
-            chunk.path for chunk in chunk_infos if chunk.path.resolve() != resolved_html_path
-        }
+        # part_paths: list[Path] = []
+        # created_chunk_paths: set[Path] = {
+        #     chunk.path for chunk in chunk_infos if chunk.path.resolve() != resolved_html_path
+        # }
 
         try:
             self.wait_for_devtools(port)
             session: CdpSession = CdpSession(self.create_page_target(port))
             try:
-                part_index_offset: int = 0
-                progress_bar_step: float = 50 / len(chunk_infos)
-                for chunk_info in chunk_infos:
-                    html_uri: str = chunk_info.path.resolve().as_uri()
-                    session.call("Page.navigate", {"url": html_uri})
-                    self.wait_for_page_ready(session)
+                session.call("Page.navigate", {"url": resolved_html_path.as_uri()})
+                self.wait_for_page_ready(session)
+                progress_bar.set_description("Printing PDF")
+                self._logger.debug("Printing PDF")
+                self.print_to_pdf(session, output_path)
+                self._logger.debug("PDF printed successfully")
 
-                    chunk_parts: list[Path]
-                    if chunk_info.use_page_ranges:
-                        chunk_parts = self.print_page_range_batches(
-                            session,
-                            part_dir,
-                            part_index_offset=part_index_offset,
-                        )
-                    else:
-                        progress_bar.set_description(self.chunk_progress_message(chunk_info))
-                        progress_bar.update(progress_bar_step)
-                        self._logger.debug(self.chunk_progress_message(chunk_info))
-                        part_path: Path = part_dir.joinpath(
-                            f"part-{part_index_offset + 1:04d}.pdf",
-                        )
-                        self.print_to_pdf(session, part_path)
-                        chunk_parts = [part_path]
-
-                    part_paths.extend(chunk_parts)
-                    part_index_offset += len(chunk_parts)
-
-                self._logger.debug(f"Merging {len(part_paths)} PDF part(s)")
-                self.merge_pdf_parts(part_paths, output_path)
-                self._logger.debug("PDF parts merged successfully")
+                # part_index_offset: int = 0
+                # progress_bar_step: float = 50 / len(chunk_infos)
+                # for chunk_info in chunk_infos:
+                #     html_uri: str = chunk_info.path.resolve().as_uri()
+                #     session.call("Page.navigate", {"url": html_uri})
+                #     self.wait_for_page_ready(session)
+                #
+                #     chunk_parts: list[Path]
+                #     if chunk_info.use_page_ranges:
+                #         chunk_parts = self.print_page_range_batches(
+                #             session,
+                #             part_dir,
+                #             part_index_offset=part_index_offset,
+                #         )
+                #     else:
+                #         progress_bar.set_description(self.chunk_progress_message(chunk_info))
+                #         progress_bar.update(progress_bar_step)
+                #         self._logger.debug(self.chunk_progress_message(chunk_info))
+                #         part_path: Path = part_dir.joinpath(
+                #             f"part-{part_index_offset + 1:04d}.pdf",
+                #         )
+                #         self.print_to_pdf(session, part_path)
+                #         chunk_parts = [part_path]
+                #
+                #     part_paths.extend(chunk_parts)
+                #     part_index_offset += len(chunk_parts)
+                #
+                # self._logger.debug(f"Merging {len(part_paths)} PDF part(s)")
+                # self.merge_pdf_parts(part_paths, output_path)
+                # self._logger.debug("PDF parts merged successfully")
             finally:
                 session.close()
         finally:
@@ -369,16 +387,16 @@ class ChromiumPdfPrinter:
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait(timeout=5)
-            for part_path in part_paths:
-                if part_path.exists():
-                    part_path.unlink()
-            if part_dir.is_dir():
-                shutil.rmtree(part_dir, ignore_errors=True)
-            for chunk_path in created_chunk_paths:
-                if chunk_path.is_file():
-                    chunk_path.unlink()
-            if chunk_dir.is_dir():
-                shutil.rmtree(chunk_dir, ignore_errors=True)
+            # for part_path in part_paths:
+            #     if part_path.exists():
+            #         part_path.unlink()
+            # if part_dir.is_dir():
+            #     shutil.rmtree(part_dir, ignore_errors=True)
+            # for chunk_path in created_chunk_paths:
+            #     if chunk_path.is_file():
+            #         chunk_path.unlink()
+            # if chunk_dir.is_dir():
+            #     shutil.rmtree(chunk_dir, ignore_errors=True)
             if user_data_dir.is_dir():
                 shutil.rmtree(user_data_dir, ignore_errors=True)
 

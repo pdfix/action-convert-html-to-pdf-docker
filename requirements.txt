@@ -3,4 +3,5 @@ tqdm==4.67.1
 types-requests==2.33.0.20260408
 urllib3==2.8.0
 websocket-client==1.8.0
-pypdf==6.21.4
+# Disabled together with chunked printing, which drops the PDF tag tree.
+# pypdf==6.21.4
