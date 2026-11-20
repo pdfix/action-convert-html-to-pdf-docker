@@ -7,7 +7,13 @@ from pathlib import Path
 from typing import Any
 
 from constants import CONFIG_FILE
-from exceptions import EC_ARG_GENERAL, MESSAGE_ARG_GENERAL, ArgumentOutputPdfException, ExpectedException
+from exceptions import (
+    EC_ARG_GENERAL,
+    MESSAGE_ARG_GENERAL,
+    ArgumentOutputFolderNotExistsException,
+    ArgumentOutputPdfException,
+    ExpectedException,
+)
 from html_to_pdf import convert_to_pdf
 from image_update import DockerImageContainerUpdateChecker
 
@@ -88,6 +94,10 @@ def html_to_pdf(url: str, output_path: str) -> None:
     """
     if not output_path.lower().endswith(".pdf"):
         raise ArgumentOutputPdfException()
+
+    output_folder: Path = Path(output_path).resolve().parent
+    if not output_folder.is_dir():
+        raise ArgumentOutputFolderNotExistsException(output_folder.as_posix())
 
     convert_to_pdf(url, output_path)
 
