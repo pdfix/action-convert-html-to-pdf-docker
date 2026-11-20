@@ -26,6 +26,7 @@ COPY config.json /usr/html-to-pdf/
 COPY src/ /usr/html-to-pdf/src/
 
 # License
+COPY THIRD_PARTY_LICENSES.md /THIRD_PARTY_LICENSES.md
 LABEL license="Chromium (BSD-style license)"
 
 ENTRYPOINT ["/usr/html-to-pdf/venv/bin/python3", "/usr/html-to-pdf/src/main.py"]
