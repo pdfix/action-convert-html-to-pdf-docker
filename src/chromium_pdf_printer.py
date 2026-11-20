@@ -16,10 +16,7 @@ import tqdm
 from cdp_session import CdpSession
 from constants import (
     CDP_IO_READ_SIZE,
-    CHROMIUM_DEVTOOLS_TIMEOUT,
     CHROMIUM_EXECUTABLE,
-    CHROMIUM_PAGE_READY_TIMEOUT,
-    CHROMIUM_PRINT_TIMEOUT,
     # PAGE_RANGE_EXCEEDED_MESSAGE,
     # PDF_PAGE_CHUNK_SIZE,
 )
@@ -68,19 +65,18 @@ class ChromiumPdfPrinter:
             return sock.getsockname()[1]
 
     @staticmethod
-    def wait_for_devtools(port: int, timeout: float = CHROMIUM_DEVTOOLS_TIMEOUT) -> None:
+    def wait_for_devtools(port: int, process: subprocess.Popen[str]) -> None:
         """
         Poll Chromium until its DevTools HTTP endpoint responds.
 
         Args:
             port (int): Remote debugging port Chromium was started with.
-            timeout (float): Maximum seconds to wait.
+            process (subprocess.Popen[str]): Running Chromium process.
 
         Raises:
-            TimeoutError: If DevTools is not available before ``timeout``.
+            RuntimeError: If Chromium exits before DevTools is available.
         """
-        deadline: float = time.time() + timeout
-        while time.time() < deadline:
+        while process.poll() is None:
             try:
                 response: requests.Response = requests.get(
                     f"http://127.0.0.1:{port}/json/version",
@@ -91,7 +87,7 @@ class ChromiumPdfPrinter:
             except requests.RequestException:
                 pass
             time.sleep(0.2)
-        raise TimeoutError("Chromium did not expose DevTools in time")
+        raise RuntimeError(f"Chromium exited with return code {process.returncode} before DevTools was available")
 
     @staticmethod
     def create_page_target(port: int) -> str:
@@ -137,7 +133,6 @@ class ChromiumPdfPrinter:
                 """,
                 "awaitPromise": True,
             },
-            timeout=CHROMIUM_PAGE_READY_TIMEOUT,
         )
 
     @staticmethod
@@ -191,7 +186,6 @@ class ChromiumPdfPrinter:
         result: dict[str, Any] = session.call(
             "Page.printToPDF",
             params,
-            timeout=CHROMIUM_PRINT_TIMEOUT,
         )
         ChromiumPdfPrinter.write_pdf_stream(session, result["stream"], destination)
 
@@ -338,7 +332,7 @@ class ChromiumPdfPrinter:
         # }
 
         try:
-            self.wait_for_devtools(port)
+            self.wait_for_devtools(port, process)
             session: CdpSession = CdpSession(self.create_page_target(port))
             try:
                 session.call("Page.navigate", {"url": resolved_html_path.as_uri()})
