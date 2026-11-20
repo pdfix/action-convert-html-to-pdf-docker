@@ -15,6 +15,8 @@ from cdp_session import CdpSession
 from constants import (
     CDP_IO_READ_SIZE,
     CHROMIUM_EXECUTABLE,
+    PAGE_HEIGHT_A4_INCHES,
+    PAGE_WIDTH_A4_INCHES,
 )
 from logger import get_logger
 
@@ -153,6 +155,8 @@ class ChromiumPdfPrinter:
         """
         params: dict[str, Any] = {
             "printBackground": True,
+            "paperWidth": PAGE_WIDTH_A4_INCHES,
+            "paperHeight": PAGE_HEIGHT_A4_INCHES,
             "preferCSSPageSize": True,
             "generateTaggedPDF": True,
             "transferMode": "ReturnAsStream",

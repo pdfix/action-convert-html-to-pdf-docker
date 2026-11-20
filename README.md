@@ -57,6 +57,7 @@ docker run --rm -v "$(pwd)":/data -w /data pdfix/convert-html-to-pdf:latest html
 
 - The Docker image uses the open-source [Chromium](https://www.chromium.org/Home/) package from Debian stable.
 - Output PDFs are tagged. Chromium builds the tag tree from the page's accessibility tree, so its quality depends on the semantic structure of the HTML.
+- Pages are A4 unless the HTML sets its own page size with CSS `@page`.
 - The whole document is printed in one pass to keep the tag tree, so very large HTML files need more container memory.
 
 ## Help & support
