@@ -38,7 +38,6 @@ docker run --rm -v "$(pwd)":/data -w /data pdfix/html-to-pdf:latest <command> [o
 |---|:---:|---|---|
 | `--input`, `-i` | yes | URL (`https://…`) or path to an existing HTML file under the mounted volume | Page to convert |
 | `--output`, `-o` | yes | Path for the output `.pdf` file | Output PDF |
-| `--version`, `-v` | no | Flag (no value); prints version and exits | Print version |
 
 ## Examples
 

@@ -1,10 +1,8 @@
 import argparse
-import json
 import sys
 import threading
 import traceback
 from pathlib import Path
-from typing import Any
 
 from constants import CONFIG_FILE
 from exceptions import (
@@ -39,8 +37,6 @@ def set_arguments(
                 parser.add_argument("--input", "-i", type=str, required=True, help="The URL or input HTML file")
             case "output":
                 parser.add_argument("--output", "-o", type=str, required=required_output, help=output_help)
-            case "version":
-                parser.add_argument("--version", "-v", help="Print version", action="store_true")
 
 
 def run_config_subcommand(args) -> None:
@@ -66,22 +62,7 @@ def get_pdfix_config(path: str) -> None:
 
 
 def run_html_to_pdf_subcommand(args) -> None:
-    if args.version:
-        print_version()
-    else:
-        html_to_pdf(args.input, args.output)
-
-
-def print_version() -> None:
-    """
-    Prints version found in config.json file.
-    """
-    config_path: Path = Path(__file__).parent.parent.joinpath(CONFIG_FILE).resolve()
-    with open(config_path, "r", encoding="utf-8") as file:
-        data: Any = json.load(file)
-        if "version" in data:
-            # Skip "v:" from "version" data
-            print(f"Version: {data['version'][2:]}")
+    html_to_pdf(args.input, args.output)
 
 
 def html_to_pdf(url: str, output_path: str) -> None:
@@ -123,7 +104,7 @@ def main() -> None:
         "html-to-pdf",
         help="Convert HTML to PDF document.",
     )
-    set_arguments(html_to_pdf_parser, ["input", "output", "version"], True, "Output PDF file")
+    set_arguments(html_to_pdf_parser, ["input", "output"], True, "Output PDF file")
     html_to_pdf_parser.set_defaults(func=run_html_to_pdf_subcommand)
 
     # Parse arguments
