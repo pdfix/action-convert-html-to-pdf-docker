@@ -25,7 +25,7 @@ venv.bak/
 
 # Test related ignores
 .test
-tests/env
-tests/out
-tests/venv
 venv-test/
+
+# Local development tests
+tests/
