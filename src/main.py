@@ -92,7 +92,7 @@ def main() -> None:
     """Parse CLI arguments and run the selected subcommand."""
     parser = argparse.ArgumentParser()
 
-    subparsers = parser.add_subparsers(dest="subparser")
+    subparsers = parser.add_subparsers(title="Commands", dest="command", required=True)
 
     # Config subcommand
     config_parser = subparsers.add_parser("config", help="Save the default configuration file")
