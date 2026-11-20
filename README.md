@@ -23,7 +23,7 @@ You need Docker installed. The first run downloads the image and may take longer
 Mount a folder into the container and run a subcommand:
 
 ```bash
-docker run --rm -v "$(pwd)":/data -w /data pdfix/html-to-pdf:latest <command> [options]
+docker run --rm -v "$(pwd)":/data -w /data pdfix/convert-html-to-pdf:latest <command> [options]
 ```
 
 ## Commands
@@ -44,13 +44,13 @@ docker run --rm -v "$(pwd)":/data -w /data pdfix/html-to-pdf:latest <command> [o
 Convert a local HTML file:
 
 ```bash
-docker run --rm -v "$(pwd)":/data -w /data pdfix/html-to-pdf:latest html-to-pdf -i /data/index.html -o /data/convert.pdf
+docker run --rm -v "$(pwd)":/data -w /data pdfix/convert-html-to-pdf:latest html-to-pdf -i /data/index.html -o /data/convert.pdf
 ```
 
 Convert a URL:
 
 ```bash
-docker run --rm -v "$(pwd)":/data -w /data pdfix/html-to-pdf:latest html-to-pdf -i "https://example.com" -o /data/convert.pdf
+docker run --rm -v "$(pwd)":/data -w /data pdfix/convert-html-to-pdf:latest html-to-pdf -i "https://example.com" -o /data/convert.pdf
 ```
 
 ## Notes
