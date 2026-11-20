@@ -35,6 +35,7 @@
             ],
             "errors": {
                 "10": "Failed to parse arguments. Please check the usage and try again.",
+                "11": "Output file must be PDF document.",
                 "30": "Failed to find input file or download webpage from URL.",
                 "31": "Failed to convert HTML to PDF."
             },
@@ -72,6 +73,7 @@
             ],
             "errors": {
                 "10": "Failed to parse arguments. Please check the usage and try again.",
+                "11": "Output file must be PDF document.",
                 "30": "Failed to find input file or download webpage from URL.",
                 "31": "Failed to convert HTML to PDF."
             },
