@@ -71,6 +71,24 @@ def run_html_to_pdf_subcommand(args) -> None:
     html_to_pdf(args.input, args.output)
 
 
+# @KA:action pdfix_convert_html_to_pdf_chrome
+# @KA:desc Converts an HTML file to a tagged PDF using the Chromium web browser. The page is opened
+# like in a browser, with its CSS, images and scripts from the same folder, and printed to PDF. The
+# tags come from the structure of the HTML. The input file is not changed, the PDF is saved as the
+# output file.
+# @KA:context Run when you have a webpage saved as an HTML file and need an accessible PDF of it. The
+# result is only as accessible as the HTML: use headings, lists, tables, `alt` on images, `lang` and a
+# `<title>`. Runs locally in Docker, no PDFix license is needed; the first run downloads the image and
+# takes longer.
+#
+# @KA:action pdfix_convert_url_to_pdf_chrome
+# @KA:desc Converts a webpage to a tagged PDF using the Chromium web browser. Chromium opens the
+# address like a browser, loads the page with its CSS, images and scripts, and prints it to PDF. The
+# tags come from the structure of the page. The PDF is saved as the output file.
+# @KA:context Run when you need an accessible PDF of a public webpage. Needs an internet connection;
+# the page is opened from your computer. The result is only as accessible as the page: headings,
+# lists, tables, `alt` on images, `lang` and a `<title>`. Runs locally in Docker, no PDFix license is
+# needed; the first run downloads the image and takes longer.
 def html_to_pdf(url: str, output_path: str) -> None:
     """
     Converts HTML page (found in URL or file system) to PDF document.
@@ -82,9 +100,23 @@ def html_to_pdf(url: str, output_path: str) -> None:
     # The action always runs in a Linux Docker container, so a local HTML file is an absolute path that starts
     # with "/" (PDFix Desktop passes "/data/<file>"). Input that is not an existing file and does not start with "/"
     # is a URL, there is no other way to tell a file name from a URL without scheme (e.g. "example.com").
+    # @KA:action pdfix_convert_html_to_pdf_chrome
+    # @KA:param input_html
+    # @KA:desc HTML file to convert. CSS, images and scripts that the page links with relative paths
+    # must be in the same folder (or its subfolders), otherwise they are missing in the PDF.
+    # @KA:problem "Input file does not exist." (error 13)
+    # @KA:solution The file shown in the message was not found. Check the path.
     if url.startswith("/") and not Path(url).is_file():
         raise ArgumentInputFileNotExistsException(url)
 
+    # @KA:action pdfix_convert_html_to_pdf_chrome pdfix_convert_url_to_pdf_chrome
+    # @KA:param output_pdf
+    # @KA:desc Where the PDF is saved. It must have the `.pdf` extension and the folder must already
+    # exist; an existing file with the same name is overwritten.
+    # @KA:problem "Output file must be PDF document." (error 11)
+    # @KA:solution Use an output file name with the `.pdf` extension.
+    # @KA:problem "Output folder does not exist." (error 12)
+    # @KA:solution Create the folder shown in the message or select another output file.
     if not output_path.lower().endswith(".pdf"):
         raise ArgumentOutputPdfException()
 

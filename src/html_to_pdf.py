@@ -47,6 +47,12 @@ def convert_to_pdf(url: str, output: str) -> None:
             logger.error("Chromium executable was not found.")
             raise FailedToConvertException()
 
+        # @KA:action pdfix_convert_html_to_pdf_chrome pdfix_convert_url_to_pdf_chrome
+        # @KA:logic Conversion failed
+        # @KA:desc When Chromium cannot print the page, the action stops and no PDF is created. The log
+        # shows the reason.
+        # @KA:problem "Failed to convert HTML to PDF." (error 31)
+        # @KA:solution Open the page in a browser to check that it works, then run the action again.
         try:
             printer.print_html_to_pdf(page_url, output_path, progress_bar)
             logger.debug("Command executed successfully")

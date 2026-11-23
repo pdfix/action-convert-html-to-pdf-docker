@@ -131,6 +131,18 @@ class ChromiumPdfPrinter:
             FailedToOpenWebpageException: If the page cannot be opened or the server returns an error status.
             UrlNotWebpageException: If the URL opens a PDF document.
         """
+        # @KA:action pdfix_convert_url_to_pdf_chrome
+        # @KA:param url
+        # @KA:desc Address of the webpage, for example `https://example.com/page`. Without `http://` or
+        # `https://` the address is opened with `https://`. The page is opened without login or cookies,
+        # so pages behind a login give the login page; content that appears only after scrolling or
+        # clicking may be missing.
+        # @KA:problem "Failed to open webpage from URL." (error 30)
+        # @KA:solution The log line above the error shows the reason, for example an unknown address,
+        # no internet connection or an HTTP error status like 404. Check the address in a browser.
+        # @KA:problem "URL points to a PDF document, not to a webpage." (error 32)
+        # @KA:solution The address opens a PDF file. Download the PDF instead; it does not need to be
+        # converted.
         navigation: dict[str, Any] = session.call("Page.navigate", {"url": page_url})
         if navigation.get("errorText"):
             self._logger.error(f"Failed to open '{page_url}': {navigation['errorText']}")
@@ -195,6 +207,25 @@ class ChromiumPdfPrinter:
             session (CdpSession): Active CDP session for the page target.
             destination (Path): Path to write the PDF data.
         """
+        # @KA:action pdfix_convert_html_to_pdf_chrome pdfix_convert_url_to_pdf_chrome
+        # @KA:logic Page loading and printing
+        # @KA:desc The page is printed after it has fully loaded (including its scripts), in one pass
+        # with backgrounds. The whole document is printed at once so the PDF keeps its tags; very large
+        # pages need more memory and time. There is no time limit, a page that never finishes loading
+        # keeps the action running until it is stopped.
+        #
+        # @KA:logic Page size
+        # @KA:desc Pages are A4 with the default margins of the browser, unless the HTML sets its own
+        # page size with CSS `@page`.
+        #
+        # @KA:logic Tags
+        # @KA:desc The PDF is tagged by Chromium from the structure of the HTML: headings, paragraphs,
+        # lists, tables, links and images. The document language comes from `lang` and the title from
+        # `<title>`; image alternative text comes from `alt`. Layout made with `div` elements without
+        # meaning gives poor tags, and accessibility problems of the HTML stay in the PDF.
+        # @KA:problem PDF/UA validation reports problems in the converted PDF.
+        # @KA:solution Fix the HTML if you can and convert again, or fix the PDF with PDFix actions,
+        # for example autotagging.
         params: dict[str, Any] = {
             "printBackground": True,
             "paperWidth": PAGE_WIDTH_A4_INCHES,
