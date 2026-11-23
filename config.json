@@ -37,7 +37,8 @@
                 "10": "Failed to parse arguments. Please check the usage and try again.",
                 "11": "Output file must be PDF document.",
                 "12": "Output folder does not exist.",
-                "30": "Failed to find input file or download webpage from URL.",
+                "13": "Input file does not exist.",
+                "30": "Failed to open webpage from URL.",
                 "31": "Failed to convert HTML to PDF.",
                 "32": "URL points to a PDF document, not to a webpage."
             },
@@ -77,7 +78,8 @@
                 "10": "Failed to parse arguments. Please check the usage and try again.",
                 "11": "Output file must be PDF document.",
                 "12": "Output folder does not exist.",
-                "30": "Failed to find input file or download webpage from URL.",
+                "13": "Input file does not exist.",
+                "30": "Failed to open webpage from URL.",
                 "31": "Failed to convert HTML to PDF.",
                 "32": "URL points to a PDF document, not to a webpage."
             },

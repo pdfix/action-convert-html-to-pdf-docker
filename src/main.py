@@ -10,6 +10,7 @@ from constants import CONFIG_FILE
 from exceptions import (
     EC_ARG_GENERAL,
     MESSAGE_ARG_GENERAL,
+    ArgumentInputFileNotExistsException,
     ArgumentOutputFolderNotExistsException,
     ArgumentOutputPdfException,
     ExpectedException,
@@ -78,6 +79,12 @@ def html_to_pdf(url: str, output_path: str) -> None:
         url (str): URL or path to file.
         output_path (str): Path to output PDF document
     """
+    # The action always runs in a Linux Docker container, so a local HTML file is an absolute path that starts
+    # with "/" (PDFix Desktop passes "/data/<file>"). Input that is not an existing file and does not start with "/"
+    # is a URL, there is no other way to tell a file name from a URL without scheme (e.g. "example.com").
+    if url.startswith("/") and not Path(url).is_file():
+        raise ArgumentInputFileNotExistsException(url)
+
     if not output_path.lower().endswith(".pdf"):
         raise ArgumentOutputPdfException()
 

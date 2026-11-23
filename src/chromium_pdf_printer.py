@@ -18,7 +18,7 @@ from constants import (
     PAGE_HEIGHT_A4_INCHES,
     PAGE_WIDTH_A4_INCHES,
 )
-from exceptions import FailedToDownloadException, UrlNotWebpageException
+from exceptions import FailedToOpenWebpageException, UrlNotWebpageException
 from logger import get_logger
 
 
@@ -128,13 +128,13 @@ class ChromiumPdfPrinter:
             page_url (str): URL of the webpage or file URI of the HTML document.
 
         Raises:
-            FailedToDownloadException: If the page cannot be opened or the server returns an error status.
+            FailedToOpenWebpageException: If the page cannot be opened or the server returns an error status.
             UrlNotWebpageException: If the URL opens a PDF document.
         """
         navigation: dict[str, Any] = session.call("Page.navigate", {"url": page_url})
         if navigation.get("errorText"):
             self._logger.error(f"Failed to open '{page_url}': {navigation['errorText']}")
-            raise FailedToDownloadException()
+            raise FailedToOpenWebpageException()
 
         self.wait_for_page_ready(session)
 
@@ -154,7 +154,7 @@ class ChromiumPdfPrinter:
         status: int = int(page_info.get("status", 0))
         if status >= 400:
             self._logger.error(f"Failed to open '{page_url}': HTTP status {status}")
-            raise FailedToDownloadException()
+            raise FailedToOpenWebpageException()
         if page_info.get("contentType") == "application/pdf":
             raise UrlNotWebpageException()
 

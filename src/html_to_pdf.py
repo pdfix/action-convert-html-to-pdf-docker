@@ -20,7 +20,7 @@ def convert_to_pdf(url: str, output: str) -> None:
         output (str): Path to output PDF document.
 
     Raises:
-        FailedToDownloadException: If the webpage cannot be opened.
+        FailedToOpenWebpageException: If the webpage cannot be opened.
         UrlNotWebpageException: If the URL opens a PDF document.
         FailedToConvertException: If Chromium is missing or conversion fails.
     """
@@ -30,6 +30,7 @@ def convert_to_pdf(url: str, output: str) -> None:
     with tqdm(total=100) as progress_bar:
         input_path: Path = Path(url)
         page_url: str
+        # Existing file is a local HTML document, anything else is a URL (missing file is reported by arguments check)
         if input_path.is_file():
             progress_bar.set_description("Reading local file")
             page_url = input_path.resolve().as_uri()
