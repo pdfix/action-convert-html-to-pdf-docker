@@ -8,6 +8,3 @@ CDP_IO_READ_SIZE: int = 65536
 # Default page size A4 (210 x 297 mm) in inches, CSS @page size of the HTML has priority
 PAGE_WIDTH_A4_INCHES: float = 210 / 25.4
 PAGE_HEIGHT_A4_INCHES: float = 297 / 25.4
-
-HTTP_REQUEST_TIMEOUT: float = 60
-DOWNLOAD_STREAM_CHUNK_SIZE: int = 1024 * 1024

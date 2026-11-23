@@ -18,6 +18,7 @@ from constants import (
     PAGE_HEIGHT_A4_INCHES,
     PAGE_WIDTH_A4_INCHES,
 )
+from exceptions import FailedToDownloadException, UrlNotWebpageException
 from logger import get_logger
 
 
@@ -116,6 +117,47 @@ class ChromiumPdfPrinter:
             },
         )
 
+    def open_page(self, session: CdpSession, page_url: str) -> None:
+        """
+        Open the page in Chromium and check that it is a webpage that can be printed.
+
+        Chromium loads the page itself, so CSS, images and scripts linked from the page are loaded too.
+
+        Args:
+            session (CdpSession): Active CDP session for the page target.
+            page_url (str): URL of the webpage or file URI of the HTML document.
+
+        Raises:
+            FailedToDownloadException: If the page cannot be opened or the server returns an error status.
+            UrlNotWebpageException: If the URL opens a PDF document.
+        """
+        navigation: dict[str, Any] = session.call("Page.navigate", {"url": page_url})
+        if navigation.get("errorText"):
+            self._logger.error(f"Failed to open '{page_url}': {navigation['errorText']}")
+            raise FailedToDownloadException()
+
+        self.wait_for_page_ready(session)
+
+        evaluation: dict[str, Any] = session.call(
+            "Runtime.evaluate",
+            {
+                "expression": """
+                    ({
+                        contentType: document.contentType,
+                        status: performance.getEntriesByType('navigation')[0]?.responseStatus ?? 0,
+                    })
+                """,
+                "returnByValue": True,
+            },
+        )
+        page_info: dict[str, Any] = evaluation.get("result", {}).get("value", {})
+        status: int = int(page_info.get("status", 0))
+        if status >= 400:
+            self._logger.error(f"Failed to open '{page_url}': HTTP status {status}")
+            raise FailedToDownloadException()
+        if page_info.get("contentType") == "application/pdf":
+            raise UrlNotWebpageException()
+
     @staticmethod
     def write_pdf_stream(session: CdpSession, stream_handle: str, destination: Path) -> None:
         """
@@ -170,7 +212,7 @@ class ChromiumPdfPrinter:
 
     def print_html_to_pdf(
         self,
-        html_path: Path,
+        page_url: str,
         output_path: Path,
         progress_bar: tqdm.tqdm,
     ) -> None:
@@ -178,12 +220,10 @@ class ChromiumPdfPrinter:
         Render an HTML document or webpage to a PDF file using headless Chromium.
 
         Args:
-            html_path (Path): Path to the HTML document to print.
+            page_url (str): URL of the webpage or file URI of the HTML document to print.
             output_path (Path): Path to write the final PDF.
             progress_bar (tqdm.tqdm): Progress bar to update.
         """
-        resolved_html_path: Path = html_path.resolve()
-
         port: int = self.pick_free_port()
         user_data_dir: Path = Path(tempfile.mkdtemp(prefix="chromium-profile-"))
         process: subprocess.Popen[str] = subprocess.Popen(
@@ -207,8 +247,7 @@ class ChromiumPdfPrinter:
             self.wait_for_devtools(port, process)
             session: CdpSession = CdpSession(self.create_page_target(port))
             try:
-                session.call("Page.navigate", {"url": resolved_html_path.as_uri()})
-                self.wait_for_page_ready(session)
+                self.open_page(session, page_url)
                 progress_bar.set_description("Printing PDF")
                 self._logger.debug("Printing PDF")
                 self.print_to_pdf(session, output_path)

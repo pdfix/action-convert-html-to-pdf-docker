@@ -1,81 +1,14 @@
 import logging
-import tempfile
-import uuid
 from pathlib import Path
-from typing import Optional
 
-import requests
 from tqdm import tqdm
 
 from chromium_pdf_printer import ChromiumPdfPrinter
-from constants import CHROMIUM_EXECUTABLE, DOWNLOAD_STREAM_CHUNK_SIZE, HTTP_REQUEST_TIMEOUT
-from exceptions import ExpectedException, FailedToConvertException, FailedToDownloadException
+from constants import CHROMIUM_EXECUTABLE
+from exceptions import ExpectedException, FailedToConvertException
 from logger import get_logger
 
 logger: logging.Logger = get_logger(__name__)
-
-
-def download_website_to_file(url: str, destination: Path) -> None:
-    """
-    Downloads content of website page to a file without loading it into memory.
-
-    Tries the URL as given, then with ``https://`` and ``http://`` prefixes.
-
-    Args:
-        url (str): URL to website.
-        destination (Path): Path to write downloaded HTML.
-
-    Raises:
-        FailedToDownloadException: If all download attempts fail.
-    """
-    first_exception: Optional[Exception] = None
-
-    for url_attempt in [url, f"https://{url}", f"http://{url}"]:
-        exception: Optional[Exception] = try_download_url_to_file(url_attempt, destination)
-        if exception is None:
-            return
-        if first_exception is None:
-            first_exception = exception
-
-    if first_exception is not None:
-        logger.error(f"{first_exception}")
-
-    raise FailedToDownloadException()
-
-
-def try_download_url_to_file(url: str, destination: Path) -> Optional[Exception]:
-    """
-    Tries to download content from URL into a file.
-
-    Args:
-        url (str): URL to website.
-        destination (Path): Path to write downloaded HTML.
-
-    Returns:
-        None on success, or the exception that occurred.
-    """
-    try:
-        with requests.get(url, stream=True, timeout=HTTP_REQUEST_TIMEOUT) as response:
-            response.raise_for_status()
-            with open(destination, "wb") as file:
-                for chunk in response.iter_content(chunk_size=DOWNLOAD_STREAM_CHUNK_SIZE):
-                    if chunk:
-                        file.write(chunk)
-    except requests.exceptions.HTTPError as e:
-        logger.warning(f"For '{url}' I got HTTPError")
-        return e
-    except requests.exceptions.ConnectionError as e:
-        logger.warning(f"For '{url}' I got ConnectionError")
-        return e
-    except requests.exceptions.Timeout as e:
-        logger.warning(f"For '{url}' I got Timeout")
-        return e
-    except requests.exceptions.RequestException as e:
-        logger.warning(f"For '{url}' I got RequestException")
-        return e
-
-    logger.info(f"For '{url}' download completed")
-    return None
 
 
 def convert_to_pdf(url: str, output: str) -> None:
@@ -87,34 +20,23 @@ def convert_to_pdf(url: str, output: str) -> None:
         output (str): Path to output PDF document.
 
     Raises:
-        FailedToDownloadException: If the input cannot be read or downloaded.
+        FailedToDownloadException: If the webpage cannot be opened.
+        UrlNotWebpageException: If the URL opens a PDF document.
         FailedToConvertException: If Chromium is missing or conversion fails.
     """
     output_path: Path = Path(output).resolve()
     printer: ChromiumPdfPrinter = ChromiumPdfPrinter()
 
     with tqdm(total=100) as progress_bar:
-        tempdir: Optional[tempfile.TemporaryDirectory[str]] = None
-        html_path: Optional[Path] = None
-
-        try:
-            input_path: Path = Path(url)
-            if input_path.is_file():
-                progress_bar.set_description("Reading local file")
-                html_path = input_path.resolve()
-            else:
-                progress_bar.set_description("Downloading webpage")
-                tempdir = tempfile.TemporaryDirectory()
-                html_path = Path(tempdir.name).joinpath(f"{uuid.uuid4()}.html")
-                download_website_to_file(url, html_path)
-        except ExpectedException:
-            raise
-        except Exception as e:
-            logger.error(f"{e}")
-            raise FailedToDownloadException()
-
-        if html_path is None:
-            raise FailedToDownloadException()
+        input_path: Path = Path(url)
+        page_url: str
+        if input_path.is_file():
+            progress_bar.set_description("Reading local file")
+            page_url = input_path.resolve().as_uri()
+        else:
+            # Chromium opens the webpage itself, so the page is printed with its CSS, images and scripts
+            progress_bar.set_description("Opening webpage")
+            page_url = url if "://" in url else f"https://{url}"
 
         progress_bar.n = 50
         progress_bar.set_description("Converting")
@@ -124,22 +46,14 @@ def convert_to_pdf(url: str, output: str) -> None:
             logger.error("Chromium executable was not found.")
             raise FailedToConvertException()
 
-        if tempdir is None:
-            logger.debug("Using local HTML file")
-        else:
-            logger.debug("Webpage saved into container")
-
         try:
-            printer.print_html_to_pdf(html_path, output_path, progress_bar)
+            printer.print_html_to_pdf(page_url, output_path, progress_bar)
             logger.debug("Command executed successfully")
         except ExpectedException:
             raise
         except Exception as e:
             logger.error(f"{e}")
             raise FailedToConvertException()
-        finally:
-            if tempdir is not None:
-                tempdir.cleanup()
 
         progress_bar.n = 100
         progress_bar.set_description("Done")

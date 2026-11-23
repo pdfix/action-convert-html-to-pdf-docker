@@ -4,6 +4,7 @@ EC_ARG_OUTPUT_FOLDER_NOT_EXISTS: int = 12
 
 EC_FAILED_TO_DOWNLOAD: int = 30
 EC_CHROME_FAILED_TO_CONVERT: int = 31
+EC_URL_NOT_WEBPAGE: int = 32
 
 MESSAGE_ARG_GENERAL: str = "Failed to parse arguments. Please check the usage and try again."
 MESSAGE_ARG_OUTPUT_PDF: str = "Output file must be PDF document."
@@ -11,6 +12,7 @@ MESSAGE_ARG_OUTPUT_FOLDER_NOT_EXISTS: str = "Output folder does not exist."
 
 MESSAGE_FAILED_TO_DOWNLOAD: str = "Failed to find input file or download webpage from URL."
 MESSAGE_CHROME_FAILED_TO_CONVERT: str = "Failed to convert HTML to PDF."
+MESSAGE_URL_NOT_WEBPAGE: str = "URL points to a PDF document, not to a webpage."
 
 
 class ExpectedException(BaseException):
@@ -84,3 +86,12 @@ class FailedToConvertException(ExpectedException):
         """Initialize with the conversion error code and message."""
         super().__init__(EC_CHROME_FAILED_TO_CONVERT)
         self._add_note(MESSAGE_CHROME_FAILED_TO_CONVERT)
+
+
+class UrlNotWebpageException(ExpectedException):
+    """Raised when the URL opens a PDF document instead of a webpage."""
+
+    def __init__(self) -> None:
+        """Initialize with the not a webpage error code and message."""
+        super().__init__(EC_URL_NOT_WEBPAGE)
+        self._add_note(MESSAGE_URL_NOT_WEBPAGE)
