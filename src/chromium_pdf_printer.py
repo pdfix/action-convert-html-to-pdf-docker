@@ -139,7 +139,8 @@ class ChromiumPdfPrinter:
         # clicking may be missing.
         # @KA:problem "Failed to open webpage from URL." (error 30)
         # @KA:solution The log line above the error shows the reason, for example an unknown address,
-        # no internet connection or an HTTP error status like 404. Check the address in a browser.
+        # no internet connection, an HTTP error status like 404 or 403 (some websites block automatic
+        # access), or a link that is not a webpage (`tel:`, `mailto:`). Check the address in a browser.
         # @KA:problem "URL points to a PDF document, not to a webpage." (error 32)
         # @KA:solution The address opens a PDF file. Download the PDF instead; it does not need to be
         # converted.

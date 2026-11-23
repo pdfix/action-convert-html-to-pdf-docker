@@ -4,8 +4,8 @@ from pathlib import Path
 from tqdm import tqdm
 
 from chromium_pdf_printer import ChromiumPdfPrinter
-from constants import CHROMIUM_EXECUTABLE
-from exceptions import ExpectedException, FailedToConvertException
+from constants import CHROMIUM_EXECUTABLE, NOT_WEBPAGE_URL_PREFIXES
+from exceptions import ExpectedException, FailedToConvertException, FailedToOpenWebpageException
 from logger import get_logger
 
 logger: logging.Logger = get_logger(__name__)
@@ -37,6 +37,9 @@ def convert_to_pdf(url: str, output: str) -> None:
         else:
             # Chromium opens the webpage itself, so the page is printed with its CSS, images and scripts
             progress_bar.set_description("Opening webpage")
+            if url.lower().startswith(NOT_WEBPAGE_URL_PREFIXES):
+                logger.error(f"Failed to open '{url}': it is not a webpage address")
+                raise FailedToOpenWebpageException()
             page_url = url if "://" in url else f"https://{url}"
 
         progress_bar.n = 50
