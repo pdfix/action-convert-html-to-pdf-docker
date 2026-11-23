@@ -80,7 +80,39 @@ def run_html_to_pdf_subcommand(args) -> None:
 # result is only as accessible as the HTML: use headings, lists, tables, `alt` on images, `lang` and a
 # `<title>`. Runs locally in Docker, no PDFix license is needed; the first run downloads the image and
 # takes longer.
-#
+# @KA:param input_html
+# @KA:desc HTML file to convert. CSS, images and scripts that the page links with relative paths
+# must be in the same folder (or its subfolders), otherwise they are missing in the PDF.
+# @KA:problem "Input file does not exist." (error 13)
+# @KA:solution The file shown in the message was not found. Check the path.
+# @KA:param output_pdf
+# @KA:desc Where the PDF is saved. It must have the `.pdf` extension and the folder must already
+# exist; an existing file with the same name is overwritten.
+# @KA:problem "Output file must be PDF document." (error 11)
+# @KA:solution Use an output file name with the `.pdf` extension.
+# @KA:problem "Output folder does not exist." (error 12)
+# @KA:solution Create the folder shown in the message or select another output file.
+# @KA:logic Page loading and printing
+# @KA:desc The page is printed after it has fully loaded (including its scripts), in one pass
+# with backgrounds. The whole document is printed at once so the PDF keeps its tags; very large
+# pages need more memory and time. A page that does not finish loading within 2 minutes stops
+# the action with error 30; printing itself has no time limit.
+# @KA:logic Page size
+# @KA:desc Pages are A4 with the default margins of the browser, unless the HTML sets its own
+# page size with CSS `@page`.
+# @KA:logic Tags
+# @KA:desc The PDF is tagged by Chromium from the structure of the HTML: headings, paragraphs,
+# lists, tables, links and images. The document language comes from `lang` and the title from
+# `<title>`; image alternative text comes from `alt`. Layout made with `div` elements without
+# meaning gives poor tags, and accessibility problems of the HTML stay in the PDF.
+# @KA:problem PDF/UA validation reports problems in the converted PDF.
+# @KA:solution Fix the HTML if you can and convert again, or fix the PDF with PDFix actions,
+# for example autotagging.
+# @KA:logic Conversion failed
+# @KA:desc When Chromium cannot print the page, the action stops and no PDF is created. The log
+# shows the reason.
+# @KA:problem "Failed to convert HTML to PDF." (error 31)
+# @KA:solution Open the page in a browser to check that it works, then run the action again.
 # @KA:action pdfix_convert_url_to_pdf_chrome
 # @KA:desc Converts a webpage to a tagged PDF using the Chromium web browser. Chromium opens the
 # address like a browser, loads the page with its CSS, images and scripts, and prints it to PDF. The
@@ -89,6 +121,48 @@ def run_html_to_pdf_subcommand(args) -> None:
 # the page is opened from your computer. The result is only as accessible as the page: headings,
 # lists, tables, `alt` on images, `lang` and a `<title>`. Runs locally in Docker, no PDFix license is
 # needed; the first run downloads the image and takes longer.
+# @KA:param url
+# @KA:desc Address of the webpage, for example `https://example.com/page`. Without `http://` or
+# `https://` the address is opened with `https://`. The page is opened without login or cookies,
+# so pages behind a login give the login page; content that appears only after scrolling or
+# clicking may be missing.
+# @KA:problem "Failed to open webpage from URL." (error 30)
+# @KA:solution The log line above the error shows the reason, for example an unknown address,
+# no internet connection, an HTTP error status like 404 or 403 (some websites block automatic
+# access), a link that is not a webpage (`tel:`, `mailto:`), or a page that did not finish
+# loading within 2 minutes (pages that keep loading, such as live blogs). Check the address in a
+# browser.
+# @KA:problem "URL points to a PDF document, not to a webpage." (error 32)
+# @KA:solution The address opens a PDF file. Download the PDF instead; it does not need to be
+# converted.
+# @KA:param output_pdf
+# @KA:desc Where the PDF is saved. It must have the `.pdf` extension and the folder must already
+# exist; an existing file with the same name is overwritten.
+# @KA:problem "Output file must be PDF document." (error 11)
+# @KA:solution Use an output file name with the `.pdf` extension.
+# @KA:problem "Output folder does not exist." (error 12)
+# @KA:solution Create the folder shown in the message or select another output file.
+# @KA:logic Page loading and printing
+# @KA:desc The page is printed after it has fully loaded (including its scripts), in one pass
+# with backgrounds. The whole document is printed at once so the PDF keeps its tags; very large
+# pages need more memory and time. A page that does not finish loading within 2 minutes stops
+# the action with error 30; printing itself has no time limit.
+# @KA:logic Page size
+# @KA:desc Pages are A4 with the default margins of the browser, unless the HTML sets its own
+# page size with CSS `@page`.
+# @KA:logic Tags
+# @KA:desc The PDF is tagged by Chromium from the structure of the HTML: headings, paragraphs,
+# lists, tables, links and images. The document language comes from `lang` and the title from
+# `<title>`; image alternative text comes from `alt`. Layout made with `div` elements without
+# meaning gives poor tags, and accessibility problems of the HTML stay in the PDF.
+# @KA:problem PDF/UA validation reports problems in the converted PDF.
+# @KA:solution Fix the HTML if you can and convert again, or fix the PDF with PDFix actions,
+# for example autotagging.
+# @KA:logic Conversion failed
+# @KA:desc When Chromium cannot print the page, the action stops and no PDF is created. The log
+# shows the reason.
+# @KA:problem "Failed to convert HTML to PDF." (error 31)
+# @KA:solution Open the page in a browser to check that it works, then run the action again.
 def html_to_pdf(url: str, output_path: str) -> None:
     """
     Converts HTML page (found in URL or file system) to PDF document.
@@ -100,23 +174,9 @@ def html_to_pdf(url: str, output_path: str) -> None:
     # The action always runs in a Linux Docker container, so a local HTML file is an absolute path that starts
     # with "/" (PDFix Desktop passes "/data/<file>"). Input that is not an existing file and does not start with "/"
     # is a URL, there is no other way to tell a file name from a URL without scheme (e.g. "example.com").
-    # @KA:action pdfix_convert_html_to_pdf_chrome
-    # @KA:param input_html
-    # @KA:desc HTML file to convert. CSS, images and scripts that the page links with relative paths
-    # must be in the same folder (or its subfolders), otherwise they are missing in the PDF.
-    # @KA:problem "Input file does not exist." (error 13)
-    # @KA:solution The file shown in the message was not found. Check the path.
     if url.startswith("/") and not Path(url).is_file():
         raise ArgumentInputFileNotExistsException(url)
 
-    # @KA:action pdfix_convert_html_to_pdf_chrome pdfix_convert_url_to_pdf_chrome
-    # @KA:param output_pdf
-    # @KA:desc Where the PDF is saved. It must have the `.pdf` extension and the folder must already
-    # exist; an existing file with the same name is overwritten.
-    # @KA:problem "Output file must be PDF document." (error 11)
-    # @KA:solution Use an output file name with the `.pdf` extension.
-    # @KA:problem "Output folder does not exist." (error 12)
-    # @KA:solution Create the folder shown in the message or select another output file.
     if not output_path.lower().endswith(".pdf"):
         raise ArgumentOutputPdfException()
 
