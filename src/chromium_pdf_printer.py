@@ -16,6 +16,7 @@ from constants import (
     CDP_IO_READ_SIZE,
     CHROMIUM_EXECUTABLE,
     PAGE_HEIGHT_A4_INCHES,
+    PAGE_LOAD_TIMEOUT,
     PAGE_WIDTH_A4_INCHES,
 )
 from exceptions import FailedToOpenWebpageException, UrlNotWebpageException
@@ -90,12 +91,16 @@ class ChromiumPdfPrinter:
         return response.json()["webSocketDebuggerUrl"]
 
     @staticmethod
-    def wait_for_page_ready(session: CdpSession) -> None:
+    def wait_for_page_ready(session: CdpSession, timeout: float) -> None:
         """
         Wait until the loaded page is ready for PDF printing.
 
         Args:
             session (CdpSession): Active CDP session for the page target.
+            timeout (float): Maximum seconds to wait.
+
+        Raises:
+            TimeoutError: If the page does not finish loading before ``timeout``.
         """
         session.call("Page.enable")
         session.call(
@@ -115,6 +120,7 @@ class ChromiumPdfPrinter:
                 """,
                 "awaitPromise": True,
             },
+            timeout=timeout,
         )
 
     def open_page(self, session: CdpSession, page_url: str) -> None:
@@ -140,16 +146,25 @@ class ChromiumPdfPrinter:
         # @KA:problem "Failed to open webpage from URL." (error 30)
         # @KA:solution The log line above the error shows the reason, for example an unknown address,
         # no internet connection, an HTTP error status like 404 or 403 (some websites block automatic
-        # access), or a link that is not a webpage (`tel:`, `mailto:`). Check the address in a browser.
+        # access), a link that is not a webpage (`tel:`, `mailto:`), or a page that did not finish
+        # loading within 2 minutes (pages that keep loading, such as live blogs). Check the address in a
+        # browser.
         # @KA:problem "URL points to a PDF document, not to a webpage." (error 32)
         # @KA:solution The address opens a PDF file. Download the PDF instead; it does not need to be
         # converted.
-        navigation: dict[str, Any] = session.call("Page.navigate", {"url": page_url})
-        if navigation.get("errorText"):
-            self._logger.error(f"Failed to open '{page_url}': {navigation['errorText']}")
-            raise FailedToOpenWebpageException()
+        deadline: float = time.time() + PAGE_LOAD_TIMEOUT
+        try:
+            navigation: dict[str, Any] = session.call("Page.navigate", {"url": page_url}, timeout=PAGE_LOAD_TIMEOUT)
+            if navigation.get("errorText"):
+                self._logger.error(f"Failed to open '{page_url}': {navigation['errorText']}")
+                raise FailedToOpenWebpageException()
 
-        self.wait_for_page_ready(session)
+            self.wait_for_page_ready(session, max(0.0, deadline - time.time()))
+        except TimeoutError:
+            self._logger.error(
+                f"Failed to open '{page_url}': page did not finish loading within {PAGE_LOAD_TIMEOUT:.0f} seconds"
+            )
+            raise FailedToOpenWebpageException()
 
         evaluation: dict[str, Any] = session.call(
             "Runtime.evaluate",
@@ -212,8 +227,8 @@ class ChromiumPdfPrinter:
         # @KA:logic Page loading and printing
         # @KA:desc The page is printed after it has fully loaded (including its scripts), in one pass
         # with backgrounds. The whole document is printed at once so the PDF keeps its tags; very large
-        # pages need more memory and time. There is no time limit, a page that never finishes loading
-        # keeps the action running until it is stopped.
+        # pages need more memory and time. A page that does not finish loading within 2 minutes stops
+        # the action with error 30; printing itself has no time limit.
         #
         # @KA:logic Page size
         # @KA:desc Pages are A4 with the default margins of the browser, unless the HTML sets its own

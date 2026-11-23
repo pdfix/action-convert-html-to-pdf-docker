@@ -5,6 +5,8 @@ DOCKER_IMAGE: str = f"{DOCKER_NAMESPACE}/{DOCKER_REPOSITORY}"
 
 CHROMIUM_EXECUTABLE: str = "/usr/bin/chromium"
 CDP_IO_READ_SIZE: int = 65536
+# Maximum time to open and load a webpage (pages that keep loading, for example live blogs)
+PAGE_LOAD_TIMEOUT: float = 120
 # Links that do not open a webpage, for example phone number or e-mail address
 NOT_WEBPAGE_URL_PREFIXES: tuple[str, ...] = ("tel:", "mailto:")
 # Default page size A4 (210 x 297 mm) in inches, CSS @page size of the HTML has priority
