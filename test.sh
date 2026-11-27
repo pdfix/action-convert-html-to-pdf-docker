@@ -65,11 +65,11 @@ fi
 
 
 info "Test #04: Run html-to-pdf for html file"
-docker run --rm $PLATFORM -v $(pwd):/data -w /data $DOCKER_IMAGE html-to-pdf -i example/pdfix.html -o $TEMPORARY_DIRECTORY/pdfix.html.pdf > /dev/null
+docker run --rm $PLATFORM -v $(pwd):/data -w /data $DOCKER_IMAGE html-to-pdf -i examples/pdfix.html -o $TEMPORARY_DIRECTORY/pdfix.html.pdf > /dev/null
 if [ -f "$(pwd)/$TEMPORARY_DIRECTORY/pdfix.html.pdf" ]; then
     success "passed"
 else
-    error "html-to-pdf for html file failed on example/pdfix.html"
+    error "html-to-pdf for html file failed on examples/pdfix.html"
     EXIT_STATUS=1
 fi
 
