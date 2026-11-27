@@ -33,7 +33,7 @@ class ChromiumPdfPrinter:
 
     def __init__(self) -> None:
         """Creates the printer logger."""
-        self._logger: logging.Logger = get_logger(__name__)
+        self._logger: logging.Logger = get_logger("app_logger")
 
     @staticmethod
     def pick_free_port() -> int:

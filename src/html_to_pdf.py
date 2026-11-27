@@ -8,7 +8,7 @@ from constants import CHROMIUM_EXECUTABLE, NOT_WEBPAGE_URL_PREFIXES
 from exceptions import ExpectedException, FailedToConvertException, FailedToOpenWebpageException
 from logger import get_logger
 
-logger: logging.Logger = get_logger(__name__)
+logger: logging.Logger = get_logger("app_logger")
 
 
 def convert_to_pdf(url: str, output: str) -> None:
